@@ -1,2 +1,2 @@
 
-export * from "./getEnv";
+export * from "./getEnvVarValue";
