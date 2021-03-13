@@ -1,6 +1,6 @@
 {
     "name": "embed-react-app-envs",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Script for embedding environment variable in CRA apps without having to rebuild the on the server.",
     "repository": {
         "type": "git",
