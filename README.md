@@ -22,7 +22,7 @@ Create react app provides no official way to inject environnement variable from 
 When you run `yarn build` create react app do bundle all the variables prefixed by `REACT_APP_`
 and expose them under `process.env` ([see here](https://create-react-app.dev/docs/adding-custom-environment-variables/)).  
 The problem, however is that you likely don't want to build your app on the server.  
-They suggest to [introduce placeholders](https://create-react-app.dev/docs/title-and-meta-tags/#injecting-data-from-the-server-into-the-page) in the `public/index.html` 
+The CRA team also suggest to [introduce placeholders](https://create-react-app.dev/docs/title-and-meta-tags/#injecting-data-from-the-server-into-the-page) in the `public/index.html` 
 and do the substitution on the server before serving the app. This solution involves a lot of hard to maintain scripting.
 
 This module abstract away the burden of managing environnement variable injection as well as providing a type safe way
