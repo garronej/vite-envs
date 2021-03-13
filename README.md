@@ -1,8 +1,8 @@
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/6702424/80216211-00ef5280-863e-11ea-81de-59f3a3d4b8e4.png">  
+    <img src="https://user-images.githubusercontent.com/6702424/111043291-087c3d80-8442-11eb-8079-176d87c733a3.png">  
 </p>
 <p align="center">
-    <i>Script for embedding environment variable in CRA apps without having to rebuild the on the server.</i>
+    <i>Safely bundle environnement variable into your react app.</i>
     <br>
     <br>
     <img src="https://github.com/garronej/embed-react-app-envs/workflows/ci/badge.svg?branch=main">
@@ -16,48 +16,15 @@
   <a href="https://github.com/garronej/embed-react-app-envs">Documentation</a>
 </p>
 
-# Install / Import
+# Motivation
 
-```bash
-$ npm install --save embed-react-app-envs
-```
+Create react app provides no official way to inject environnement variable from the server into the page. 
+When you run `yarn build` create react app do bundle all the variables prefixed by `REACT_APP_`
+and expose them under `process.env` ([see here](https://create-react-app.dev/docs/adding-custom-environment-variables/)).  
+The problem, however is that you likely don't want to build your app on the server.  
+They suggest to [introduce placeholders](https://create-react-app.dev/docs/title-and-meta-tags/#injecting-data-from-the-server-into-the-page) in the `public/index.html` 
+and do the substitution on the server before serving the app. This solution involves a lot of hard to maintain scripting.
 
-```typescript
-import { myFunction, myObject } from "embed-react-app-envs";
-```
+This module abstract away the burden of managing environnement variable injection as well as providing a type safe way
+to retrieve them in your code (using TypeScript).
 
-Specific imports:
-
-```typescript
-import { myFunction } from "embed-react-app-envs/myFunction";
-import { myObject } from "embed-react-app-envs/myObject";
-```
-
-## Import from HTML, with CDN
-
-Import it via a bundle that creates a global ( wider browser support ):
-
-```html
-<script src="//unpkg.com/embed-react-app-envs/bundle.min.js"></script>
-<script>
-    const { myFunction, myObject } = embed_react_app_envs;
-</script>
-```
-
-Or import it as an ES module:
-
-```html
-<script type="module">
-    import { myFunction, myObject } from "//unpkg.com/embed-react-app-envs/zz_esm/index.js";
-</script>
-```
-
-_You can specify the version you wish to import:_ [unpkg.com](https://unpkg.com)
-
-## Contribute
-
-```bash
-npm install
-npm run build
-npm test
-```
