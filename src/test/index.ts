@@ -1,41 +1,20 @@
-//This will not run on deno, we need a separate test runner for Deno (./mod.ts).
+import { downloadAndUnzip } from "../tools/downloadAndUnzip";
+import * as st from "scripting-tools";
+import { join as pathJoin } from "path";
+import { getProjectRoot } from "../tools/getProjectRoot";
 
-import * as child_process from "child_process";
-import * as path from "path";
-import { Deferred } from "evt/tools/Deferred";
+const sampleProjectDirPath = pathJoin(getProjectRoot(), "sample_project");
 
-const names = ["myFunction", "myObject", "getProjectRoot"];
+downloadAndUnzip({
+    "url": "https://github.com/garronej/embed-react-app-envs/releases/download/ASSETS/sample_project.zip",
+    "destDirPath": sampleProjectDirPath
+});
 
-(async () => {
-    if (!!process.env.FORK) {
-        process.once("unhandledRejection", error => {
-            throw error;
-        });
+const bin = require(pathJoin(getProjectRoot(), "package.json"))["bin"];
 
-        require(process.env.FORK);
-
-        return;
-    }
-
-    for (const name of names) {
-        console.log(`Running: ${name}`);
-
-        const dExitCode = new Deferred<number>();
-
-        child_process
-            .fork(__filename, undefined, {
-                "env": { "FORK": path.join(__dirname, name) },
-            })
-            .on("message", console.log)
-            .once("exit", code => dExitCode.resolve(code ?? 1));
-
-        const exitCode = await dExitCode.pr;
-
-        if (exitCode !== 0) {
-            console.log(`${name} exited with error code: ${exitCode}`);
-            process.exit(exitCode);
-        }
-
-        console.log("\n");
-    }
-})();
+Object.keys(bin).forEach(scriptName =>
+    st.execSyncTrace(
+        `node ${pathJoin(getProjectRoot(), bin[scriptName])}`,
+        { "cwd": sampleProjectDirPath }
+    )
+);
