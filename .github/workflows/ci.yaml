@@ -13,8 +13,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: [ '14', '13', '12' ]
-        os: [ windows-latest, ubuntu-latest ]
+        node: [ '14' ]
+        os: [  ubuntu-latest ]
     name: Test with Node v${{ matrix.node }} on ${{ matrix.os }}
     steps:
     - name: Tell if project is using npm or yarn
