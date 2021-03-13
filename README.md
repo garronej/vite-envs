@@ -10,11 +10,6 @@
     <img src="https://img.shields.io/npm/dw/embed-react-app-envs">
     <img src="https://img.shields.io/npm/l/embed-react-app-envs">
 </p>
-<p align="center">
-  <a href="https://github.com/garronej/embed-react-app-envs">Home</a>
-  -
-  <a href="https://github.com/garronej/embed-react-app-envs">Documentation</a>
-</p>
 
 # Motivation
 
