@@ -118,6 +118,6 @@ each time you update `.env` you are good.
 ENTRYPOINT sh -c "npx embed-environment-variables && mv build /usr/share/nginx/html && nginx -g 'daemon off;'"
 ```
 
-See [complete `Dockerfile`](https://github.com/InseeFrLab/onyxia-ui/blob/master/Dockerfile) example.
+See [complete `Dockerfile`](TODO) example. 
 
 
