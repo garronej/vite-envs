@@ -83,8 +83,8 @@ in the console:
 ```
 
 Now if you run `yarn build` then `REACT_APP_BAZ="Value of baz on the server" npx embed-environnement-variables`
-the value of `REACT_APP_BAZ` will be injected in `build/index.html` so that if you start serving
-your app, for example with `npx serve` you will get this in the console:  
+the value of `REACT_APP_BAZ` will be injected in `build/index.html` so that if you start statically serving
+the `build/` dir, for example with `npx serve` you will get this in the console:  
 
 ```json
 {
