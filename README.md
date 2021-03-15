@@ -86,8 +86,8 @@ in the console:
 }
 ```
 
-Now if you run `yarn build` then `REACT_APP_BAZ="Value of baz on the server" npx embed-environnement-variables`
-the value of `REACT_APP_BAZ` will be injected in `build/index.html` so that if you start statically serving
+Now if you run `yarn build` then `BAZ="Value of baz on the server" npx embed-environnement-variables`
+the value of `BAZ` will be injected in `build/index.html` so that if you start statically serving
 the `build/` dir, for example with `npx serve` you will get this in the console:  
 
 ```json
@@ -98,6 +98,9 @@ the `build/` dir, for example with `npx serve` you will get this in the console:
     "FIZZ": ""
 }
 ```
+
+Note that on the server the environment variable names don't need to be prefixed with `REACT_APP_` (they can though).
+
 # Setup
 
 `package.json`
