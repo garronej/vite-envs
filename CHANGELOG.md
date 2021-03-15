@@ -1,3 +1,11 @@
+### **0.0.6** (2021-03-14)  
+  
+- Improve comments on generated envs getter  
+- Add tags  
+- Update README.md  
+- Update README.md  
+- Update README.md    
+  
 ### **0.0.5** (2021-03-13)  
   
   
