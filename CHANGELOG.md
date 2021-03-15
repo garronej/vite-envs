@@ -1,3 +1,11 @@
+### **0.1.1** (2021-03-15)  
+  
+- Removes test on windows  
+- Update CI  
+- Add spaces  
+- Update logo  
+- Update logo    
+  
 ## **0.1.0** (2021-03-15)  
   
   
