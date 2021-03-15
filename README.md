@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/6702424/111203919-de538880-85c5-11eb-9b99-3fae5c5b7580.png">  
+    <img src="https://user-images.githubusercontent.com/6702424/111204509-7b162600-85c6-11eb-8142-cd06eee33fcf.png">  
 </p>
 <p align="center">
     <i>Safely bundle server's environment variable into react apps</i>
