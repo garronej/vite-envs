@@ -1,3 +1,10 @@
+## **0.1.0** (2021-03-15)  
+  
+- Remove spaces  
+- Rename module  
+- Update README.md  
+- Create the src dir if not exsist    
+  
 ### **0.0.6** (2021-03-14)  
   
 - Improve comments on generated envs getter  
