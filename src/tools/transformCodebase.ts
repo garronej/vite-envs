@@ -2,7 +2,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { crawl } from "./crawl";
-import { id } from "evt/tools/typeSafety/id";
+import { id } from "./id";
 
 type TransformSourceCode = 
         (params: {
