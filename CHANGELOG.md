@@ -1,5 +1,9 @@
 ## **0.1.0** (2021-03-15)  
   
+- Update logo    
+  
+## **0.1.0** (2021-03-15)  
+  
 - Remove spaces  
 - Rename module  
 - Update README.md  
