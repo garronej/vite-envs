@@ -1,3 +1,9 @@
+### **0.1.3** (2021-03-15)  
+  
+- Update README.md  
+- Update README.md  
+- Allow the build folder to be named 'html'    
+  
 ### **0.1.2** (2021-03-15)  
   
 - Update dependencies    
