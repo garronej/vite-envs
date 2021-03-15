@@ -89,7 +89,7 @@ in the console:
 Now if you run `yarn build` then `BAZ="Value of baz on the server" npx embed-environnement-variables`
 the value of `BAZ` will be injected in `build/index.html` (or `html/index.html`) so that if you 
 start statically serving
-the `build/` dir, for example with `npx serve` you will get this in the console:  
+the `build/` dir, for example with `serve -s build` you will get this in the console:  
 
 ```json
 {
