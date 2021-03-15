@@ -1,2 +1,2 @@
 
-export const nameOfTheGlobal= "__embed-react-app-envs__";
+export const nameOfTheGlobal= "__react-envs__";

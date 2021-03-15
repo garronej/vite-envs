@@ -1,10 +1,10 @@
 {
-    "name": "embed-react-app-envs",
-    "version": "0.0.7",
+    "name": "react-envs",
+    "version": "0.1.0",
     "description": "Script for embedding environment variable in CRA apps without having to rebuild the on the server.",
     "repository": {
         "type": "git",
-        "url": "git://github.com/garronej/embed-react-app-envs.git"
+        "url": "git://github.com/garronej/react-envs.git"
     },
     "main": "dist/lib/index.js",
     "types": "dist/lib/index.d.ts",
@@ -33,7 +33,7 @@
         "environment-variables",
         "typescript"
     ],
-    "homepage": "https://github.com/garronej/embed-react-app-envs",
+    "homepage": "https://github.com/garronej/react-envs",
     "dependencies": {
         "@types/dotenv": "^8.2.0",
         "cheerio": "^1.0.0-rc.5",

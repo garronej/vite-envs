@@ -2,7 +2,7 @@ import { nameOfTheGlobal } from "../bin/nameOfTheGlobal";
 
 const errorMessage = [
     "The environnement variable should have been embedded in the script at build time.",
-    "Check the documentation embed-react-app-envs"
+    "Check the documentation react-envs"
 ].join(" ");
 
 export function getEnvVarValue(envVarName: string): string {
