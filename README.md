@@ -87,7 +87,8 @@ in the console:
 ```
 
 Now if you run `yarn build` then `BAZ="Value of baz on the server" npx embed-environnement-variables`
-the value of `BAZ` will be injected in `build/index.html` so that if you start statically serving
+the value of `BAZ` will be injected in `build/index.html` (or `html/index.html`) so that if you 
+start statically serving
 the `build/` dir, for example with `npx serve` you will get this in the console:  
 
 ```json
@@ -101,30 +102,12 @@ the `build/` dir, for example with `npx serve` you will get this in the console:
 
 Note that on the server the environment variable names don't need to be prefixed with `REACT_APP_` (they can though).
 
-# Setup
+# Demo setup
 
-`package.json`
-```json
-"scripts": {
-    "postinstall": "generate-typed-env-getter",
-    "prestart": "generate-typed-env-getter",
-    "pretest": "generate-typed-env-getter"
-}
-```
-NOTE: Those scripts are optional, as long as you remember to rerun `npx generate-typed-env-getter`
-each time you update `.env` you are good.
+Find [**here**](https://github.com/garronej/react-envs-demo-app) a demo setup to help you integrate `react-envs`
+in your app.
 
-`.gitignore`
-```ini
-/src/env.ts
-```
+![image](https://user-images.githubusercontent.com/6702424/111223899-09e26d00-85de-11eb-84ea-566f9ed58eee.png)
 
-`Dockerfile`
-```dockerfile
-# build environment
-ENTRYPOINT sh -c "npx embed-environment-variables && mv build /usr/share/nginx/html && nginx -g 'daemon off;'"
-```
-
-See [complete `Dockerfile`](TODO) example. TODO: Link example
-
+![image](https://user-images.githubusercontent.com/6702424/111223405-685b1b80-85dd-11eb-977c-e8ea1eda1e29.png)
 

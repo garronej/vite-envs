@@ -9,9 +9,18 @@ import { nameOfTheGlobal } from "./nameOfTheGlobal";
 
 const targetProjectDirPath = process.cwd();
 
-//const envNames =getEnvNames({ targetProjectDirPath });
+const candidateIndexHtmlFilePaths =
+    ["build", "html"]
+        .map(name => pathJoin(targetProjectDirPath, name, "index.html"));
 
-const indexHtmlFilePath = pathJoin(targetProjectDirPath, "build", "index.html");
+const indexHtmlFilePath = candidateIndexHtmlFilePaths.find(fs.existsSync);
+
+if (indexHtmlFilePath === undefined) {
+    throw new Error([
+        "Can't find the index.html to inject var env in. ",
+        `Tried: ${candidateIndexHtmlFilePaths.join("nor")}`
+    ].join(" "));
+}
 
 const $ = cheerio.load(fs.readFileSync(indexHtmlFilePath).toString("utf8"));
 
