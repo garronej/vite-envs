@@ -4,6 +4,7 @@
 <p align="center">
     <i>Safely bundle server's environment variable into react apps</i>
     <br>
+    <br>
     <img src="https://github.com/garronej/react-envs/workflows/ci/badge.svg?branch=main">
     <img src="https://img.shields.io/bundlephobia/minzip/react-envs">
     <img src="https://img.shields.io/npm/dw/react-envs">
