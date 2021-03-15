@@ -12,8 +12,12 @@ const doUseJs = process.argv[2]?.toLowerCase() === "js";
 const thisModuleName = require(pathJoin(getProjectRoot(), "package.json"))["name"];
 const thisScriptName = pathBasename(__filename).split(".")[0];
 
+const targetProjectSrcDirPath = pathJoin(targetProjectDirPath, "src");
+
+fs.mkdirSync(targetProjectSrcDirPath, { "recursive": true });
+
 fs.writeFileSync(
-    pathJoin(targetProjectDirPath, "src", `env.${doUseJs ? "js" : "ts"}`),
+    pathJoin(targetProjectSrcDirPath, `env.${doUseJs ? "js" : "ts"}`),
     Buffer.from(
         [
             '/* ',
