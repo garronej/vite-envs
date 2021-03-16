@@ -2,7 +2,7 @@
     <img src="https://user-images.githubusercontent.com/6702424/111204692-b31d6900-85c6-11eb-8a24-99add8e0edb9.png">  
 </p>
 <p align="center">
-    <i>Safely bundle server's environment variable into react apps</i>
+    <i>Safely bundle server's environment variables into react apps</i>
     <br>
     <br>
     <img src="https://github.com/garronej/react-envs/workflows/ci/badge.svg?branch=main">
