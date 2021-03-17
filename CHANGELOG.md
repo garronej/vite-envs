@@ -1,3 +1,7 @@
+### **0.1.6** (2021-03-17)  
+  
+- Feat memoization    
+  
 ### **0.1.5** (2021-03-17)  
   
 - Document --includes-.env.local feature  
