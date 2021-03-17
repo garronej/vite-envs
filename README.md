@@ -14,7 +14,7 @@
 # Motivation
 
 We want to be able to do that `docker run --env FOO="value of foo" my-org/my-app` 
-then assessed `FOO` in the app like `process.env["FOO"]`.  
+then access `FOO` in the app like `process.env["FOO"]`.  
 
 Create react app provides no official way to inject environment variable from the server into the page.  
 When you run `yarn build` create react app does bundle all the variables prefixed by `REACT_APP_`
