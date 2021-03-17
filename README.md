@@ -13,7 +13,7 @@
 
 # Motivation
 
-We want to be able to do that `docker run --env FOO="value of foo" my-org/my-app` 
+We want to be able to do that `docker run --env FOO="xyz" my-org/my-app` 
 then access `FOO` in the app like `process.env["FOO"]`.  
 
 Create react app provides no official way to inject environment variable from the server into the page.  
@@ -24,7 +24,7 @@ The CRA team also suggests to [introduce placeholders](https://create-react-app.
 and do the substitution on the server before serving the app. This solution involves a lot of hard to maintain scripting.
 
 This module abstract away the burden of managing environment variable injection as well as providing a type-safe way
-to retrieve them in your code.
+to access them in your code.
 
 # Step by step guide
 
