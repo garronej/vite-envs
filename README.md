@@ -102,7 +102,7 @@ the `build/` dir, for example with `serve -s build` you will get this in the con
 
 Note that on the server the environment variable names don't need to be prefixed with `REACT_APP_` (they can though).
 
-# Demo setup
+# Clean docker setup
 
 Find [**here**](https://github.com/garronej/react-envs-demo-app) a demo setup to help you integrate `react-envs`
 in your app.
