@@ -104,11 +104,13 @@ the `build/` dir, for example with `serve -s build` you will get this in the con
 ```
 
 Note that on the server the environment variable names don't need to be prefixed with `REACT_APP_` (they can though).
-Also note that the script runs very fast and thus represent virtually no overhead when starting your container.
+Also note that the script runs very fast and thus represent virtually no overhead when starting your container.  
+By default `embed-environnement-variables` does not embed variables defined in `.env.local`, if you want to include
+them use: `--includes-.env.local` or `-i`.
 
-The next step is to set up a clean Dockerfile where there is both node and ngnix available.  
+The next step is to set up a clean Dockerfile where there is both node and Ngnix available.  
 Node for being able to run `npx embed-environnement-variables` and Ngnix for serving the app.  
-It is also important to make sure `react-envs` is not bootstraped by `npx` in the entypoint.
+It is also important to make sure `react-envs` is not bootstraped by `npx` in the entrypoint.
 
 # Clean setup example
 
