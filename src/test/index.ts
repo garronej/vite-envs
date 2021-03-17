@@ -14,7 +14,7 @@ const bin = require(pathJoin(getProjectRoot(), "package.json"))["bin"];
 
 Object.keys(bin).forEach(scriptName =>
     st.execSyncTrace(
-        `node ${pathJoin(getProjectRoot(), bin[scriptName])}`,
+        `node ${pathJoin(getProjectRoot(), bin[scriptName])} js`,
         { "cwd": sampleProjectDirPath }
     )
 );
