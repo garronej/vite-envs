@@ -101,8 +101,13 @@ the `build/` dir, for example with `serve -s build` you will get this in the con
 ```
 
 Note that on the server the environment variable names don't need to be prefixed with `REACT_APP_` (they can though).
+Also note that the script runs very fast and thus represent virtually no overhead when starting your container.
 
-# Clean docker setup
+The next step is to set up a clean Dockerfile where there is both node and ngnix available.  
+node for being able to run `npx embed-environnement-variables` and Ngnix for serving the app.  
+It is also important to make sure `react-envs` is not bootstraped by `npx in the entypoint`.
+
+# Clean setup example
 
 Find [**here**](https://github.com/garronej/react-envs-demo-app) a demo setup to help you integrate `react-envs`
 in your app.
