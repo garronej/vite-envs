@@ -104,8 +104,8 @@ Note that on the server the environment variable names don't need to be prefixed
 Also note that the script runs very fast and thus represent virtually no overhead when starting your container.
 
 The next step is to set up a clean Dockerfile where there is both node and ngnix available.  
-node for being able to run `npx embed-environnement-variables` and Ngnix for serving the app.  
-It is also important to make sure `react-envs` is not bootstraped by `npx in the entypoint`.
+Node for being able to run `npx embed-environnement-variables` and Ngnix for serving the app.  
+It is also important to make sure `react-envs` is not bootstraped by `npx` in the entypoint.
 
 # Clean setup example
 
