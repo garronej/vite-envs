@@ -1,8 +1,10 @@
 import { nameOfTheGlobal } from "../bin/nameOfTheGlobal";
 
-const errorMessage = [
-    "The environnement variable should have been embedded in the script at build time.",
-    "Check the documentation react-envs"
+const getErrorMessage = (envVarName: string)=>[
+    "This project is using react-envs however it seems that",
+    "the script 'npx embed-environnement-variables' hasn't been",
+    `run. As a result the value of ${envVarName} was not bundle`,
+    "in the script. Documentation: https://github.com/garronej/react-envs"
 ].join(" ");
 
 export function getEnvVarValue(envVarName: string): string {
@@ -16,13 +18,13 @@ export function getEnvVarValue(envVarName: string): string {
     }
 
     if (process.env["NODE_ENV"] === "production") {
-        throw new Error(errorMessage);
+        throw new Error(getErrorMessage(envVarName));
     }
 
     value = process.env[`REACT_APP_${envVarName}`];
 
     if (value === undefined) {
-        throw new Error(errorMessage);
+        throw new Error(getErrorMessage(envVarName));
     }
 
     return value;

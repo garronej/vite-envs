@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { join as pathJoin, basename as pathBasename } from "path";
-import { getEnvNames } from "./getEnvNames";
+import { readEnvFromFile } from "./readEnvFromFile";
 import * as fs from "fs";
 import { getProjectRoot } from "../tools/getProjectRoot";
 
@@ -30,7 +30,7 @@ fs.writeFileSync(
             '',
             'export function getEnv() {',
             '    return {',
-            getEnvNames({ targetProjectDirPath })
+            Object.keys(readEnvFromFile({ targetProjectDirPath, "target": ".env" }))
                 .map(envName => `        "${envName}": getEnvVarValue("${envName}")`)
                 .join(",\n"),
             `    }${doUseJs ? "" : " as const"};`,

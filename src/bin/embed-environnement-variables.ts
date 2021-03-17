@@ -2,12 +2,14 @@
 
 import "minimal-polyfills/Object.fromEntries";
 import { join as pathJoin } from "path";
-import { getEnvNames } from "./getEnvNames";
+import { readEnvFromFile } from "./readEnvFromFile";
 import cheerio from "cheerio";
 import * as fs from "fs";
 import { nameOfTheGlobal } from "./nameOfTheGlobal";
 
 const targetProjectDirPath = process.cwd();
+
+const includesEnvLocal = ["--includes-.env.local", "-i"].includes(process.argv[2] ?? "");
 
 const candidateIndexHtmlFilePaths =
     ["build", "html"]
@@ -28,15 +30,25 @@ const domId = "environnement-variables";
 
 $(`head > #${domId}`).remove();
 
+const envLocal = includesEnvLocal ? 
+    readEnvFromFile({ targetProjectDirPath, "target": ".env.local" }) : 
+    {};
+
 $("head").prepend(
     [
         `<script id="${domId}">`,
         `   window["${nameOfTheGlobal}"]= ${JSON.stringify(
             Object.fromEntries(
-                getEnvNames({ targetProjectDirPath })
+                Object.keys(readEnvFromFile({ targetProjectDirPath, "target": ".env" }))
                     .map(envName => [
                         envName,
-                        process.env[envName] || process.env[`REACT_APP_${envName}`] || ""
+                        (
+                            process.env[envName] ||
+                            process.env[`REACT_APP_${envName}`] ||
+                            envLocal[envName] ||
+                            envLocal[`REACT_APP_${envName}`] ||
+                            ""
+                        )
                     ])
             )
         )};`,
