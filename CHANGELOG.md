@@ -1,3 +1,16 @@
+### **0.1.5** (2021-03-17)  
+  
+- Document --includes-.env.local feature  
+- Enabled to include .env.local in embed-environnement-variables  
+- Update README.md  
+- Update README.md  
+- Update README.md  
+- Update README.md  
+- Update README.md  
+- Update README.md  
+- Update README.md  
+- Update README.md    
+  
 ### **0.1.4** (2021-03-16)  
   
 - Rename gnerate-typed-env-getter to generate-env-getter  
