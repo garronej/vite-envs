@@ -2,7 +2,7 @@
     <img src="https://user-images.githubusercontent.com/6702424/111204692-b31d6900-85c6-11eb-8a24-99add8e0edb9.png">  
 </p>
 <p align="center">
-    <i>Safely bundle server's environment variables into react apps</i>
+    <i>Safely bundle server environment variable into react apps</i>
     <br>
     <br>
     <img src="https://github.com/garronej/react-envs/workflows/ci/badge.svg?branch=main">
@@ -13,15 +13,18 @@
 
 # Motivation
 
+We want to be able to do that `docker run --env FOO="xyz" my-org/my-app` 
+then access `FOO` in the app like `process.env["FOO"]`.  
+
 Create react app provides no official way to inject environment variable from the server into the page.  
 When you run `yarn build` create react app does bundle all the variables prefixed by `REACT_APP_`
 and expose them under `process.env` ([see here](https://create-react-app.dev/docs/adding-custom-environment-variables/)).  
 The problem, however, is that you likely don't want to build your app on the server.  
-The CRA team also suggests to [introduce placeholders](https://create-react-app.dev/docs/title-and-meta-tags/#injecting-data-from-the-server-into-the-page) in the `public/index.html` 
+For this use case the CRA team suggests to [introduce placeholders](https://create-react-app.dev/docs/title-and-meta-tags/#injecting-data-from-the-server-into-the-page) in the `public/index.html` 
 and do the substitution on the server before serving the app. This solution involves a lot of hard to maintain scripting.
 
 This module abstract away the burden of managing environment variable injection as well as providing a type-safe way
-to retrieve them in your code.
+to access them in your code.
 
 # Step by step guide
 
@@ -101,8 +104,13 @@ the `build/` dir, for example with `serve -s build` you will get this in the con
 ```
 
 Note that on the server the environment variable names don't need to be prefixed with `REACT_APP_` (they can though).
+Also note that the script runs very fast and thus represent virtually no overhead when starting your container.
 
-# Demo setup
+The next step is to set up a clean Dockerfile where there is both node and ngnix available.  
+Node for being able to run `npx embed-environnement-variables` and Ngnix for serving the app.  
+It is also important to make sure `react-envs` is not bootstraped by `npx` in the entypoint.
+
+# Clean setup example
 
 Find [**here**](https://github.com/garronej/react-envs-demo-app) a demo setup to help you integrate `react-envs`
 in your app.

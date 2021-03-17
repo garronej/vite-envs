@@ -1,3 +1,9 @@
+### **0.1.4** (2021-03-16)  
+  
+- Rename gnerate-typed-env-getter to generate-env-getter  
+- Update README.md  
+- Update readme    
+  
 ### **0.1.3** (2021-03-15)  
   
 - Update README.md  
