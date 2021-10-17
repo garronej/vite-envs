@@ -1,3 +1,7 @@
+## **0.2.0** (2021-10-17)  
+  
+- Better generated env file    
+  
 ### **0.1.6** (2021-03-17)  
   
 - Feat memoization    
