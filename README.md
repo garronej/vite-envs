@@ -13,7 +13,7 @@
 
 # Motivation
 
-We want to be able to do that `docker run --env FOO="xyz" my-org/my-create-react-app` 
+We want to be able to do `docker run --env FOO="xyz" my-org/my-create-react-app` 
 then access `FOO` in the app like `process.env["FOO"]`.  
 
 Create react app provides no official way to inject environment variable from the server into the page.  
