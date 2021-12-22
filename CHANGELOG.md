@@ -1,3 +1,7 @@
+### **0.2.2** (2021-12-22)  
+  
+- Bump version before rename    
+  
 ### **0.2.1** (2021-12-22)  
   
 - Fix non space characters  
