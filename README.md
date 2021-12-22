@@ -2,7 +2,7 @@
     <img src="https://user-images.githubusercontent.com/6702424/147039599-3783531a-a23f-48eb-88c4-413790f4c0ec.png">  
 </p>
 <p align="center">
-    <i>🛠 Environment variables in create-react-app 🛠</i>
+    <i>🛠 Use environment variables in create-react-app projects 🛠</i>
     <br>
     <br>
     <img src="https://github.com/garronej/cra-envs/workflows/ci/badge.svg?branch=main">
