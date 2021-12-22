@@ -1,2 +1,2 @@
 
-export const nameOfTheGlobal= "__react-envs__";
+export const nameOfTheGlobal= "__cra-envs__";

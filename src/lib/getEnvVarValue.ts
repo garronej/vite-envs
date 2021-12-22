@@ -1,10 +1,10 @@
 import { nameOfTheGlobal } from "../bin/nameOfTheGlobal";
 
 const getErrorMessage = (envVarName: string)=>[
-    "This project is using react-envs however it seems that",
+    "This project is using cra-envs however it seems that",
     "the script 'npx embed-environnement-variables' hasn't been",
     `run. As a result the value of ${envVarName} was not bundle`,
-    "in the script. Documentation: https://github.com/garronej/react-envs"
+    "in the script. Documentation: https://github.com/garronej/cra-envs"
 ].join(" ");
 
 export function getEnvVarValue(envVarName: string): string {

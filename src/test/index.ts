@@ -6,7 +6,7 @@ import { getProjectRoot } from "../tools/getProjectRoot";
 const sampleProjectDirPath = pathJoin(getProjectRoot(), "sample_project");
 
 downloadAndUnzip({
-    "url": "https://github.com/garronej/react-envs/releases/download/ASSETS/sample_project.zip",
+    "url": "https://github.com/garronej/cra-envs/releases/download/ASSETS/sample_project.zip",
     "destDirPath": sampleProjectDirPath
 });
 
