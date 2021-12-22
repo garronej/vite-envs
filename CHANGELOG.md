@@ -1,3 +1,8 @@
+# **1.0.0** (2021-12-22)  
+  
+- Add lockfile  
+- Rename to cra-envs, bump to v1    
+  
 ### **0.2.1** (2021-12-22)  
   
 - Fix non space characters  
