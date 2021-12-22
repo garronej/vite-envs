@@ -1,3 +1,10 @@
+### **0.2.1** (2021-12-22)  
+  
+- Fix non space characters  
+- Update README.md  
+- Update README.md  
+- Update README.md    
+  
 ## **0.2.0** (2021-10-17)  
   
 - Better generated env file    
