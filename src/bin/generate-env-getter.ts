@@ -26,7 +26,7 @@ fs.writeFileSync(
             `* then run 'npx ${thisScriptName}${doUseJs ? " js" : ""}' at the root of your project.`,
             '* This file will be updated.',
             '*/',
-            `import { getEnvVarValue } from "${thisModuleName}";`,
+            `import { getEnvVarValue } from "${thisModuleName}";`,
             '',
             'export const envNames = [',
             Object.keys(readEnvFromFile({ targetProjectDirPath, "target": ".env" }))
