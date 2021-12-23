@@ -5,10 +5,18 @@
     <i>🛠 Use environment variables in create-react-app projects 🛠</i>
     <br>
     <br>
-    <img src="https://github.com/garronej/cra-envs/workflows/ci/badge.svg?branch=main">
-    <img src="https://img.shields.io/bundlephobia/minzip/cra-envs">
-    <img src="https://img.shields.io/npm/dw/cra-envs">
-    <img src="https://img.shields.io/npm/l/cra-envs">
+    <a href="https://github.com/garronej/cra-envs/actions">
+      <img src="https://github.com/garronej/cra-envs/workflows/ci/badge.svg?branch=main">
+    </a>
+    <a href="https://bundlephobia.com/package/cra-envs">
+      <img src="https://img.shields.io/bundlephobia/minzip/cra-envs">
+    </a>
+    <a href="https://www.npmjs.com/package/cra-envs">
+      <img src="https://img.shields.io/npm/dw/cra-envs">
+    </a>
+    <a href="https://github.com/garronej/cra-envs/blob/main/LICENSE">
+      <img src="https://img.shields.io/npm/l/cra-envs">
+    </a>
 </p>
 
 Safely bundle server environment variables into statically served React SPA.
