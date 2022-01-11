@@ -1,3 +1,7 @@
+## **1.1.0** (2022-01-11)  
+  
+- Make it compatible with publiccode-editor https://github.com/italia/publiccode-editor/issues/229    
+  
 # **1.0.0** (2021-12-22)  
   
 - Add lockfile  
