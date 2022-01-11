@@ -12,7 +12,7 @@ const targetProjectDirPath = process.cwd();
 const includesEnvLocal = ["--includes-.env.local", "-i"].includes(process.argv[2] ?? "");
 
 const candidateIndexHtmlFilePaths =
-    ["build", "html"]
+    ["build", "html", "dist"]
         .map(name => pathJoin(targetProjectDirPath, name, "index.html"));
 
 const indexHtmlFilePath = candidateIndexHtmlFilePaths.find(fs.existsSync);
