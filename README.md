@@ -11,9 +11,6 @@
     <a href="https://bundlephobia.com/package/cra-envs">
       <img src="https://img.shields.io/bundlephobia/minzip/cra-envs">
     </a>
-    <a href="https://www.npmjs.com/package/cra-envs">
-      <img src="https://img.shields.io/npm/dw/cra-envs">
-    </a>
     <a href="https://github.com/garronej/cra-envs/blob/main/LICENSE">
       <img src="https://img.shields.io/npm/l/cra-envs">
     </a>
