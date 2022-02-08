@@ -1,3 +1,7 @@
+## **1.2.0** (2022-02-08)  
+  
+- Support remplacing env in index.html and EJS    
+  
 ## **1.1.0** (2022-01-11)  
   
 - Make it compatible with publiccode-editor https://github.com/italia/publiccode-editor/issues/229    
