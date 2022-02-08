@@ -1,3 +1,7 @@
+### **1.2.1** (2022-02-08)  
+  
+- Fix EJS variables injection    
+  
 ## **1.2.0** (2022-02-08)  
   
 - Support remplacing env in index.html and EJS    
