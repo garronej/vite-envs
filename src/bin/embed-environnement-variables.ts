@@ -95,7 +95,11 @@ if (indexHtmlPublicFilePath !== undefined) {
         )
     });
 
-    str = ejs.render(str, resolvedEnvsWithReactAppPrefix);
+    str = ejs.render(str, {
+        "process": {
+            "env": resolvedEnvsWithReactAppPrefix
+        }
+    });
 
     const $_public = cheerio.load(str);
 
