@@ -4,8 +4,12 @@ import "minimal-polyfills/Object.fromEntries";
 import { join as pathJoin } from "path";
 import { readEnvFromFile } from "./readEnvFromFile";
 import cheerio from "cheerio";
+import type { CheerioAPI } from "cheerio";
 import * as fs from "fs";
 import { nameOfTheGlobal } from "./nameOfTheGlobal";
+import { multiReplace } from "../tools/multiReplace";
+import ejs from "ejs";
+import url from "url";
 
 const targetProjectDirPath = process.cwd();
 
@@ -24,34 +28,101 @@ if (indexHtmlFilePath === undefined) {
     ].join(" "));
 }
 
-const $ = cheerio.load(fs.readFileSync(indexHtmlFilePath).toString("utf8"));
+
+const { resolvedEnvs } = (() => {
+
+    const envLocal = includesEnvLocal ?
+        readEnvFromFile({ targetProjectDirPath, "target": ".env.local" }) :
+        {};
+
+    const resolvedEnvs = Object.fromEntries(
+        Object.keys(readEnvFromFile({ targetProjectDirPath, "target": ".env" }))
+            .map(envName => [
+                envName,
+                (
+                    process.env[envName] ||
+                    process.env[`REACT_APP_${envName}`] ||
+                    envLocal[envName] ||
+                    envLocal[`REACT_APP_${envName}`] ||
+                    ""
+                )
+            ])
+    );
+
+    return { resolvedEnvs };
+
+})();
+
+let $: CheerioAPI | undefined = cheerio.load(fs.readFileSync(indexHtmlFilePath).toString("utf8"));
+
+const indexHtmlPublicFilePath= [ pathJoin(targetProjectDirPath, "public", "index.html") ].find(fs.existsSync);
+
+if (indexHtmlPublicFilePath !== undefined) {
+
+    let str = fs.readFileSync(indexHtmlPublicFilePath).toString("utf8");
+
+    const resolvedEnvsWithReactAppPrefix = {
+        ...Object.fromEntries(
+            Object.entries(resolvedEnvs)
+                .map(([key, value]) => [`REACT_APP_${key}`, value])
+        ),
+        "PUBLIC_URL": (()=>{
+
+            const packageJsonFilePath = [pathJoin( targetProjectDirPath, "package.json")].find(fs.existsSync);
+
+            if( !packageJsonFilePath ){
+                return "";
+            }
+
+            const { homepage } = JSON.parse(fs.readFileSync(packageJsonFilePath).toString("utf8"));
+
+            if( homepage === undefined ){
+                return "";
+            }
+
+            const { pathname } = url.parse(homepage);
+
+            return pathname === "/" ? "" : (pathname ?? "");
+
+        })()
+    };
+
+    str = multiReplace({
+        "input": str,
+        "keyValues": Object.fromEntries(
+            Object.entries(resolvedEnvsWithReactAppPrefix)
+                .map(([key, value]) => [`%${key}%`, value])
+        )
+    });
+
+    str = ejs.render(str, resolvedEnvsWithReactAppPrefix);
+
+    const $_public = cheerio.load(str);
+
+    $_public("body").replaceWith($("body"));
+
+    const lastHead = $_public("head *").last();
+
+    const htmlToInsert = $("head")
+        .contents()
+        .toString()
+        .split(lastHead.toString())
+        .reverse()[0];
+
+    $_public("head").append(htmlToInsert);
+
+    $ = $_public;
+
+}
 
 const domId = "environnement-variables";
 
 $(`head > #${domId}`).remove();
 
-const envLocal = includesEnvLocal ? 
-    readEnvFromFile({ targetProjectDirPath, "target": ".env.local" }) : 
-    {};
-
 $("head").prepend(
     [
         `<script id="${domId}">`,
-        `   window["${nameOfTheGlobal}"]= ${JSON.stringify(
-            Object.fromEntries(
-                Object.keys(readEnvFromFile({ targetProjectDirPath, "target": ".env" }))
-                    .map(envName => [
-                        envName,
-                        (
-                            process.env[envName] ||
-                            process.env[`REACT_APP_${envName}`] ||
-                            envLocal[envName] ||
-                            envLocal[`REACT_APP_${envName}`] ||
-                            ""
-                        )
-                    ])
-            )
-        )};`,
+        `   window["${nameOfTheGlobal}"]= ${JSON.stringify(resolvedEnvs)};`,
         `</script>`
     ].join("\n")
 );
