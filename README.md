@@ -137,7 +137,7 @@ It is also important to make sure `cra-envs` is not bootstraped by `npx` in the 
 
 # Clean setup example
 
-Find [**here**](https://github.com/garronej/cra-envs-demo-app) a demo setup to help you integrate `cra-envs`
+Find 👉[**here**](https://github.com/garronej/cra-envs-demo-app)👈 a demo setup to help you integrate `cra-envs`
 in your app.
 
 ![image](https://user-images.githubusercontent.com/6702424/111223899-09e26d00-85de-11eb-84ea-566f9ed58eee.png)
