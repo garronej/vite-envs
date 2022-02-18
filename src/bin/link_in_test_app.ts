@@ -1,8 +1,9 @@
 import { execSync } from "child_process";
 import { join as pathJoin, relative as pathRelative } from "path";
 import * as fs from "fs";
+import { getProjectRoot } from "./tools/getProjectRoot";
 
-const projectDirPath = pathJoin(__dirname, "..", "..");
+const projectDirPath = getProjectRoot();
 
 fs.writeFileSync(
     pathJoin(projectDirPath, "dist", "package.json"),
@@ -26,7 +27,7 @@ fs.writeFileSync(
 
 const commonThirdPartyDeps = (() => {
     const namespaceModuleNames: string[] = [];
-	const standaloneModuleNames = ["react", "@types/react"];
+	const standaloneModuleNames: string[] = [];
 
     return [
         ...namespaceModuleNames
