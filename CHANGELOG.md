@@ -1,3 +1,18 @@
+### **1.2.2** (2022-02-18)  
+  
+- Restore old test  
+- Fix build  
+- Update readme  
+- Fix link  
+- Fix build  
+- Add script in package.json for linking in test app  
+- Script for linking in test app  
+- Reword  
+- Add pointing fingers  
+- Update README  
+- Update .gitatributes so no vanila JS appears in language statistic  
+- Update .gitatributes so no vanila JS appears in language statistic    
+  
 ### **1.2.1** (2022-02-08)  
   
 - Fix EJS variables injection    
