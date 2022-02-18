@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import { join as pathJoin, relative as pathRelative } from "path";
 import * as fs from "fs";
-import { getProjectRoot } from "./tools/getProjectRoot";
+import { getProjectRoot } from "../tools/getProjectRoot";
 
 const projectDirPath = getProjectRoot();
 

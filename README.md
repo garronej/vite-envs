@@ -17,7 +17,6 @@
 </p>
 
 Distribute customizable create-react-app!  
-
 # Motivation
 
 We want to be able to do `docker run --env FOO="xyz" my-org/my-create-react-app` 
@@ -38,6 +37,10 @@ and do the substitution on the server before serving the app. This solution invo
 
 This module abstract away the burden of managing environment variable injection as well as providing a type-safe way
 to access them in your code.
+
+# Showcase
+
+
 
 # Setup example
 
