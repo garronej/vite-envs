@@ -23,6 +23,12 @@ Distribute customizable create-react-app!
 We want to be able to do `docker run --env FOO="xyz" my-org/my-create-react-app` 
 then access `FOO` in the app like `process.env["FOO"]`.  
 
+We want to be able to access our env in the `public/index.html` file: [example](https://github.com/garronej/cra-envs-demo-app/blob/e1aa8067b52a563bc5db18558e7ed7746a56c9c0/public/index.html#L129).  
+
+> 💡 `public/index.html` support EJS ([really](https://github.com/facebook/create-react-app/issues/3112#issuecomment-328829771))!  
+> 
+> This would enable us to conditionally [preload one font or another](https://github.com/garronej/cra-envs-demo-app/blob/e1aa8067b52a563bc5db18558e7ed7746a56c9c0/public/index.html#L6-L21).
+
 Create react app provides no official way to inject environment variable from the server into the page.  
 When you run `yarn build` create react app does bundle all the variables prefixed by `REACT_APP_`
 and expose them under `process.env` ([see here](https://create-react-app.dev/docs/adding-custom-environment-variables/)).  
@@ -33,7 +39,15 @@ and do the substitution on the server before serving the app. This solution invo
 This module abstract away the burden of managing environment variable injection as well as providing a type-safe way
 to access them in your code.
 
-# Step by step guide
+# Setup example
+
+Find 👉[**here**](https://github.com/garronej/cra-envs-demo-app)👈 a demo setup with a fresh create-react-app.
+
+![image](https://user-images.githubusercontent.com/6702424/111223899-09e26d00-85de-11eb-84ea-566f9ed58eee.png)
+
+![image](https://user-images.githubusercontent.com/6702424/111223405-685b1b80-85dd-11eb-977c-e8ea1eda1e29.png)
+
+# More details on how it works
 
 Start by installing the tool: 
 
@@ -135,13 +149,3 @@ them use: `--includes-.env.local` or `-i`.
 The next step is to set up a clean Dockerfile where there is both node and Ngnix available.  
 Node for being able to run `npx embed-environnement-variables` and Ngnix for serving the app.  
 It is also important to make sure `cra-envs` is not bootstraped by `npx` in the entrypoint.
-
-# Clean setup example
-
-Find 👉[**here**](https://github.com/garronej/cra-envs-demo-app)👈 a demo setup to help you integrate `cra-envs`
-in your app.
-
-![image](https://user-images.githubusercontent.com/6702424/111223899-09e26d00-85de-11eb-84ea-566f9ed58eee.png)
-
-![image](https://user-images.githubusercontent.com/6702424/111223405-685b1b80-85dd-11eb-977c-e8ea1eda1e29.png)
-
