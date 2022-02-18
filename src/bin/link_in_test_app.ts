@@ -65,7 +65,7 @@ const testAppNames = ["cra-envs-demo-app"] as const;
 
 const getTestAppPath = (testAppName: typeof testAppNames[number]) => pathJoin(projectDirPath, "..", testAppName);
 
-testAppNames.forEach(testAppName => execSync("yarn install", { "cwd": getTestAppPath(testAppName) }));
+testAppNames.forEach(testAppName => execSync("rm -rf node_modules && yarn install", { "cwd": getTestAppPath(testAppName) }));
 
 console.log("=== Linking common dependencies ===");
 
