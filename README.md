@@ -16,7 +16,8 @@
     </a>
 </p>
 
-Safely bundle server environment variables into statically served React SPA.
+Distribute customizable create-react-app!  
+
 # Motivation
 
 We want to be able to do `docker run --env FOO="xyz" my-org/my-create-react-app` 
