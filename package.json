@@ -15,8 +15,8 @@
         "link_in_test_app": "node dist/bin/link_in_test_app.js"
     },
     "bin": {
-        "embed-environnement-variables": "dist/bin/embed-environnement-variables.js",
-        "generate-env-getter": "dist/bin/generate-env-getter.js"
+        "generate-env-getter": "dist/bin/generate-env-getter.js",
+        "embed-environnement-variables": "dist/bin/embed-environnement-variables.js"
     },
     "author": "u/garronej",
     "license": "MIT",

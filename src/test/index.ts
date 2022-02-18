@@ -10,20 +10,24 @@ downloadAndUnzip({
     "destDirPath": sampleProjectDirPath
 });
 
-const bin = require(pathJoin(getProjectRoot(), "package.json"))["bin"];
+const binDirPath = pathJoin(getProjectRoot(), "dist", "bin");
 
-for (const arg of ["", " js"]) {
+st.enableCmdTrace();
 
-    Object.keys(bin).forEach(scriptName => {
-        const out = st.execSyncTrace(
-            `node ${pathJoin(getProjectRoot(), bin[scriptName])}${arg}`,
-            { "cwd": sampleProjectDirPath }
-        );
+["", " js"].forEach(arg => 
+    st.execSyncTrace(
+        `node ${pathJoin(binDirPath, "generate-env-getter.js")}${arg}`,
+        { "cwd": sampleProjectDirPath }
+    )
+);
 
-        if (out !== undefined) {
-            console.log(out);
+st.execSyncTrace(
+    `node ${pathJoin(binDirPath, "embed-environnement-variables.js")}`,
+    { 
+        "cwd": sampleProjectDirPath,
+        "env": {
+            
         }
+    }
+);
 
-    });
-
-}
