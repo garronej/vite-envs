@@ -101,11 +101,15 @@ if (indexHtmlPublicFilePath !== undefined) {
         }
     });
 
+
+
     const $_public = cheerio.load(str);
 
     $_public("body").replaceWith($("body"));
 
     const lastHead = $_public("head *").last();
+
+    console.log(lastHead.toString());
 
     const htmlToInsert = $("head")
         .contents()
@@ -116,6 +120,7 @@ if (indexHtmlPublicFilePath !== undefined) {
     $_public("head").append(htmlToInsert);
 
     $ = $_public;
+
 
 }
 
