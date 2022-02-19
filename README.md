@@ -49,7 +49,7 @@ This enables for example to conditionally [preload one font or another](https://
 # Usecase example
 
 <p align="center">
-	<img src="https://user-images.githubusercontent.com/6702424/147029706-40b2d807-2733-44fe-9f59-08b935555848.png" />
+	<img src="https://user-images.githubusercontent.com/6702424/154810177-3da80638-93c3-4a41-9710-13541b9d8974.png" />
 </p>
 
 [Onyxia-web](https://github.com/InseeFrLab/onyxia-web) is a create-react-app distributed as a [Docker image](https://hub.docker.com/r/inseefrlab/onyxia-web/tags).  
