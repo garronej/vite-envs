@@ -11,6 +11,9 @@
     <a href="https://bundlephobia.com/package/cra-envs">
       <img src="https://img.shields.io/bundlephobia/minzip/cra-envs">
     </a>
+    <a href="https://github.com/garronej/cra-envs/blob/aa97a3cc446a0afdb7769a1d351c5b45723d3481/tsconfig.json#L14">
+        <img src="https://camo.githubusercontent.com/0f9fcc0ac1b8617ad4989364f60f78b2d6b32985ad6a508f215f14d8f897b8d3/68747470733a2f2f62616467656e2e6e65742f62616467652f547970655363726970742f7374726963742532302546302539462539322541412f626c7565">
+    </a>
     <a href="https://github.com/garronej/cra-envs/blob/main/LICENSE">
       <img src="https://img.shields.io/npm/l/cra-envs">
     </a>
