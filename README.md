@@ -57,10 +57,7 @@ This enables for example to conditionally [preload one font or another](https://
 Sysadmins that would like to deploy Onyxia on their infrastructure can simply use
 [the official Docker image](https://hub.docker.com/r/inseefrlab/onyxia-web/tags) and provide relevant environnement variable to adust the theme/branding of the website to their usecase.  
 
-Deployment examples:  
-- [SSPCloud Datalab](https://datalab.sspcloud.fr)
-- [SILL test bench](https://garronej.dev)  
-
+Here are two deployment example:  
 
 <p align="center">
   <a href="https://datalab.sspcloud.fr">
@@ -69,6 +66,9 @@ Deployment examples:
   <a href="https://garronej.dev">
     <img src="https://user-images.githubusercontent.com/6702424/154809580-b38abbc2-d7be-4fc2-ad7d-b830d88f3a57.png">  
   </a>
+</p>
+<p align="center">
+        <sub><sup><em>Click on the social media preview to access the websites</em></sup></sub>
 </p>
 
 
