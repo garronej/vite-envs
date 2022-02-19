@@ -21,7 +21,7 @@
 
 # Motivation
 
-Create-react-app [supports environment variable](https://create-react-app.dev/docs/adding-custom-environment-variables/) but they are bundled at build time, when `yarn build` is run.  
+Create-react-app [supports environment variable](https://create-react-app.dev/docs/adding-custom-environment-variables/) but they are bundled at build time when `yarn build` is run.  
 It means that if we want to change anything like the URL of the backend the app should connect to, we have to rebuild, we can't ship customizable Docker image of our CRA apps.  
 
 The solution would be to be able to do:  
@@ -36,14 +36,14 @@ Then access `FOO`:
 
 # Features
 
-- ✅  EJS support in `public/index.html` ([few peoples knows](https://github.com/facebook/create-react-app/issues/3112#issuecomment-328829771)).  
-This enables for example to conditionally [preload one font or another](https://github.com/garronej/cra-envs-demo-app/blob/e1aa8067b52a563bc5db18558e7ed7746a56c9c0/public/index.html#L6-L21)  
 - ✅ No impact on the startup time.
 - ✅ No impact on the Docker image size.  
-- ✅ Require no network connection at container startup.
-- ✅ Secure: It only inject the envs declared in the `.env` file.  
-- ✅ (Optional) Type safe: An env getter is generated so [you know what envs are available](https://user-images.githubusercontent.com/6702424/154802407-92d2d0b7-b74c-4b35-a2b5-5c27c26d5127.png).  
+- ✅ Require no network connection at container startups.
+- ✅ Secure: It only injects the envs declared in the `.env` file.  
 - ✅ It works like you are already used to. It just changes **when** the envs
+- ✅  EJS support in `public/index.html` ([few peoples knows](https://github.com/facebook/create-react-app/issues/3112#issuecomment-328829771)).  
+This enables for example to conditionally [preload one font or another](https://github.com/garronej/cra-envs-demo-app/blob/e1aa8067b52a563bc5db18558e7ed7746a56c9c0/public/index.html#L6-L21)  
+- ✅ (Optional) Type safe: An env getter is generated so [you know what envs are available](https://user-images.githubusercontent.com/6702424/154802407-92d2d0b7-b74c-4b35-a2b5-5c27c26d5127.png).  
   are injected.  
 
 
@@ -61,7 +61,7 @@ Find 👉[**here**](https://github.com/garronej/cra-envs-demo-app)👈 a demo se
 
 The recommended way to get started with `cra-envs` is to follow the instructions
 provided in [the cra-envs-demo-app](https://github.com/garronej/cra-envs-demo-app).  
-Now, if you want to aquire a deeper understanding what the tool does and how
+Now, if you want to acquire a deeper understanding what the tool does and how
 you can follow the following steps.
 
 Start by installing the tool: 
