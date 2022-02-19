@@ -2,7 +2,7 @@
     <img src="https://user-images.githubusercontent.com/6702424/154800287-c8433ac4-26c1-43fb-9507-46cd0b6e751a.png">  
 </p>
 <p align="center">
-    <i>Bundle your environment variable in your create-react-app at <strike>build time</strike> <b> launch time</b>!</i>
+    <i>Bundle environment variables in create-react-app at <strike>build time</strike> <b> launch time</b>!</i>
     <br>
     <br>
     <a href="https://github.com/garronej/cra-envs/actions">
