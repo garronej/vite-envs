@@ -101,26 +101,13 @@ if (indexHtmlPublicFilePath !== undefined) {
         }
     });
 
-
-
     const $_public = cheerio.load(str);
 
     $_public("body").replaceWith($("body"));
 
-    const lastHead = $_public("head *").last();
-
-    console.log(lastHead.toString());
-
-    const htmlToInsert = $("head")
-        .contents()
-        .toString()
-        .split(lastHead.toString())
-        .reverse()[0];
-
-    $_public("head").append(htmlToInsert);
+    $_public("head").append($("head link[href*='/static/css/']"));
 
     $ = $_public;
-
 
 }
 
