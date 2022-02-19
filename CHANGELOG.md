@@ -1,3 +1,10 @@
+### **1.2.4** (2022-02-19)  
+  
+- Fix restoring splitted up CSS  
+- Add typescript strict  
+- Remove script link in test app  
+- Use test project with splitted css    
+  
 ### **1.2.3** (2022-02-18)  
   
 - Fix tests    
