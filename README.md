@@ -22,7 +22,7 @@
 # Motivation
 
 Create-react-app [supports environment variable](https://create-react-app.dev/docs/adding-custom-environment-variables/) but they are bundled at build time when `yarn build` is run.  
-It means that if we want to change anything like the URL of the backend the app should connect to, we have to rebuild, we can't ship customizable Docker image of our CRA apps.  
+If we want to change anything like the URL of the backend the app should connect to, we have to rebuild, we can't ship customizable Docker image of our CRA apps.  
 
 The solution would be to be able to do:  
 ```bash
@@ -47,14 +47,35 @@ This enables for example to conditionally [preload one font or another](https://
   are injected.  
 
 
-# Showcase
+# Usecase example
 
-WIP
+<p align="center">
+	<img src="https://user-images.githubusercontent.com/6702424/147029706-40b2d807-2733-44fe-9f59-08b935555848.png" />
+</p>
+
+[Onyxia-web](https://github.com/InseeFrLab/onyxia-web) is a create-react-app distributed as a [Docker image](https://hub.docker.com/r/inseefrlab/onyxia-web/tags).  
+
+Sysadmins that would like to deploy Onyxia on their infrastructure can simply use
+[the official Docker image](https://hub.docker.com/r/inseefrlab/onyxia-web/tags) and provide relevant environnement variable to adust the theme/branding of the website to their usecase.  
+
+Deployment examples:  
+- [SSPCloud Datalab](https://datalab.sspcloud.fr)
+- [SILL test bench](https://garronej.dev)  
+
+
+<p align="center">
+  <a href="https://datalab.sspcloud.fr">
+    <img src="https://user-images.githubusercontent.com/6702424/154808798-8f5c29d0-cf39-4b34-96d0-ba0388b52037.png">  
+  </a>
+  <a href="https://garronej.dev">
+    <img src="https://user-images.githubusercontent.com/6702424/154808797-fd2b6152-e6ac-4bea-9f18-53617f07581c.png">  
+  </a>
+</p>
 
 # Documentation
 
 Find 👉[**here**](https://github.com/garronej/cra-envs-demo-app)👈 a demo setup of:  
-`cra-envs` + `create-react-app` + `nginx` + `docker`
+`cra-envs` + `create-react-app` + `TypeScript` + `Nginx` + `Docker`
 
 
 # More details on how it works
