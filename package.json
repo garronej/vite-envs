@@ -1,6 +1,6 @@
 {
     "name": "cra-envs",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "description": "Script for embedding server variable in CRA apps without having to rebuild.",
     "repository": {
         "type": "git",
