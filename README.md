@@ -1,8 +1,8 @@
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/6702424/147039599-3783531a-a23f-48eb-88c4-413790f4c0ec.png">  
+    <img src="https://user-images.githubusercontent.com/6702424/154800287-c8433ac4-26c1-43fb-9507-46cd0b6e751a.png">  
 </p>
 <p align="center">
-    <i>🛠 Use environment variables in create-react-app projects 🛠</i>
+    <i>Bundle your environment variable in your create-react-app at <strike>build time</strike> <b> launch time</b>!</i>
     <br>
     <br>
     <a href="https://github.com/garronej/cra-envs/actions">
@@ -19,41 +19,50 @@
     </a>
 </p>
 
-Distribute customizable create-react-app!  
 # Motivation
 
-We want to be able to do `docker run --env FOO="xyz" my-org/my-create-react-app` 
-then access `FOO` in the app like `process.env["FOO"]`.  
+Create-react-app [supports environment variable](https://create-react-app.dev/docs/adding-custom-environment-variables/) but they are bundled at build time, when `yarn build` is run.  
+It means that if we want to change anything like the URL of the backend the app should connect to, we have to rebuild, we can't ship customizable Docker image of our CRA apps.  
 
-We want to be able to access our env in the `public/index.html` file: [example](https://github.com/garronej/cra-envs-demo-app/blob/e1aa8067b52a563bc5db18558e7ed7746a56c9c0/public/index.html#L129).  
+The solution would be to be able to do:  
+```bash
+ docker run --env FOO="xyz" my-org/my-create-react-app
+ ```
+Then access `FOO`:  
+- In the code like `process.env["FOO"]` 
+- In `public/index.html` like `<title>%FOO%</title>`
 
-> 💡 `public/index.html` support EJS ([really](https://github.com/facebook/create-react-app/issues/3112#issuecomment-328829771))!  
-> 
-> This would enable us to conditionally [preload one font or another](https://github.com/garronej/cra-envs-demo-app/blob/e1aa8067b52a563bc5db18558e7ed7746a56c9c0/public/index.html#L6-L21).
+`cra-envs` does just that, in a secure, performant and type safe way.  
 
-Create react app provides no official way to inject environment variable from the server into the page.  
-When you run `yarn build` create react app does bundle all the variables prefixed by `REACT_APP_`
-and expose them under `process.env` ([see here](https://create-react-app.dev/docs/adding-custom-environment-variables/)).  
-The problem, however, is that you likely don't want to build your app on the server.  
-For this use case the CRA team suggests to [introduce placeholders](https://create-react-app.dev/docs/title-and-meta-tags/#injecting-data-from-the-server-into-the-page) in the `public/index.html` 
-and do the substitution on the server before serving the app. This solution involves a lot of hard to maintain scripting.
+# Features
 
-This module abstract away the burden of managing environment variable injection as well as providing a type-safe way
-to access them in your code.
+- ✅  EJS support in `public/index.html` ([few peoples knows](https://github.com/facebook/create-react-app/issues/3112#issuecomment-328829771)).  
+This enables for example to conditionally [preload one font or another](https://github.com/garronej/cra-envs-demo-app/blob/e1aa8067b52a563bc5db18558e7ed7746a56c9c0/public/index.html#L6-L21)  
+- ✅ No impact on the startup time.
+- ✅ No impact on the Docker image size.  
+- ✅ Require no network connection at container startup.
+- ✅ Secure: It only inject the envs declared in the `.env` file.  
+- ✅ (Optional) Type safe: An env getter is generated so [you know what envs are available](https://user-images.githubusercontent.com/6702424/154802407-92d2d0b7-b74c-4b35-a2b5-5c27c26d5127.png).  
+- ✅ It works like you are already used to. It just changes **when** the envs
+  are injected.  
+
 
 # Showcase
 
+WIP
 
+# Documentation
 
-# Setup example
+Find 👉[**here**](https://github.com/garronej/cra-envs-demo-app)👈 a demo setup of:  
+`cra-envs` + `create-react-app` + `nginx` + `docker`
 
-Find 👉[**here**](https://github.com/garronej/cra-envs-demo-app)👈 a demo setup with a fresh create-react-app.
-
-![image](https://user-images.githubusercontent.com/6702424/111223899-09e26d00-85de-11eb-84ea-566f9ed58eee.png)
-
-![image](https://user-images.githubusercontent.com/6702424/111223405-685b1b80-85dd-11eb-977c-e8ea1eda1e29.png)
 
 # More details on how it works
+
+The recommended way to get started with `cra-envs` is to follow the instructions
+provided in [the cra-envs-demo-app](https://github.com/garronej/cra-envs-demo-app).  
+Now, if you want to aquire a deeper understanding what the tool does and how
+you can follow the following steps.
 
 Start by installing the tool: 
 
@@ -154,4 +163,4 @@ them use: `--includes-.env.local` or `-i`.
 
 The next step is to set up a clean Dockerfile where there is both node and Ngnix available.  
 Node for being able to run `npx embed-environnement-variables` and Ngnix for serving the app.  
-It is also important to make sure `cra-envs` is not bootstraped by `npx` in the entrypoint.
+It is also important to make sure `cra-envs` is not bootstrapped by `npx` in the entrypoint.
