@@ -64,12 +64,13 @@ Deployment examples:
 
 <p align="center">
   <a href="https://datalab.sspcloud.fr">
-    <img src="https://user-images.githubusercontent.com/6702424/154808798-8f5c29d0-cf39-4b34-96d0-ba0388b52037.png">  
+    <img src="https://user-images.githubusercontent.com/6702424/154809578-4aaa5501-e356-484b-8a95-c2a59e287cf9.png">  
   </a>
   <a href="https://garronej.dev">
-    <img src="https://user-images.githubusercontent.com/6702424/154808797-fd2b6152-e6ac-4bea-9f18-53617f07581c.png">  
+    <img src="https://user-images.githubusercontent.com/6702424/154809580-b38abbc2-d7be-4fc2-ad7d-b830d88f3a57.png">  
   </a>
 </p>
+
 
 # Documentation
 
