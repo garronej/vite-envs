@@ -55,7 +55,7 @@ This enables for example to conditionally [preload one font or another](https://
 [Onyxia-web](https://github.com/InseeFrLab/onyxia-web) is a create-react-app distributed as a [Docker image](https://hub.docker.com/r/inseefrlab/onyxia-web/tags).  
 
 Sysadmins that would like to deploy Onyxia on their infrastructure can simply use
-[the official Docker image](https://hub.docker.com/r/inseefrlab/onyxia-web/tags) and provide relevant environnement variable to adust the theme/branding of the website to their usecase.  
+[the official Docker image](https://hub.docker.com/r/inseefrlab/onyxia-web/tags) and provide relevant environnement variable to adjust the theme/branding of the website to their usecase.  
 
 Here are two deployment example:  
 
