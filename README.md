@@ -43,7 +43,7 @@ Then access `FOO`:
 - ✅ It works like you are already used to. It just changes **when** the envs are injected.  
 - ✅  EJS support in `public/index.html` ([did you know?](https://github.com/facebook/create-react-app/issues/3112#issuecomment-328829771)).  
 This enables for example to conditionally [preload one font or another](https://github.com/garronej/cra-envs-demo-app/blob/e1aa8067b52a563bc5db18558e7ed7746a56c9c0/public/index.html#L6-L21)  
-- ✅ (Optional) Type safe: An env getter is generated so [you know what envs are available](https://user-images.githubusercontent.com/6702424/154802407-92d2d0b7-b74c-4b35-a2b5-5c27c26d5127.png) are injected.  
+- ✅ (Optional) Type safe: An env getter is generated so [you know what envs are available](https://user-images.githubusercontent.com/6702424/154802407-92d2d0b7-b74c-4b35-a2b5-5c27c26d5127.png).  
 
 
 # Usecase example
