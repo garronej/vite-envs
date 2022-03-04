@@ -6,7 +6,8 @@ import { getProjectRoot } from "../tools/getProjectRoot";
 const sampleProjectDirPath = pathJoin(getProjectRoot(), "sample_project");
 
 downloadAndUnzip({
-    "url": "https://github.com/garronej/cra-envs/releases/download/ASSETS/sample_project_6.zip",
+    //"url": "https://github.com/garronej/cra-envs/releases/download/ASSETS/sample_project_6.zip",
+    "url": "https://github.com/etalab/cra-envs/releases/download/ASSETS/SEP-Pilot-client.zip",
     "destDirPath": sampleProjectDirPath
 });
 

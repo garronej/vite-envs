@@ -105,6 +105,7 @@ if (indexHtmlPublicFilePath !== undefined) {
 
     $_public("body").replaceWith($("body"));
 
+    $_public("head").append($("head script[src*='/static/js/']"));
     $_public("head").append($("head link[href*='/static/css/']"));
 
     $ = $_public;
