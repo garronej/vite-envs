@@ -1,3 +1,17 @@
+### **1.2.5** (2022-02-20)  
+  
+- Remove path from dependencies  
+- Update README.md  
+- Update README.md  
+- Round corder of side by side laptops image  
+- Fix mixtup links  
+- Improve readme quality  
+- Smaller images  
+- Add social media previews as links  
+- fmt  
+- Drastically Update README  
+- Improve readme    
+  
 ### **1.2.4** (2022-02-19)  
   
 - Fix restoring splitted up CSS  
