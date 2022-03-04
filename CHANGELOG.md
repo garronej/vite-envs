@@ -1,3 +1,9 @@
+### **1.2.6** (2022-03-04)  
+  
+- Fix processing of public/index.html file when there is a script in the header  
+- Update README.md  
+- Fix typo    
+  
 ### **1.2.5** (2022-02-20)  
   
 - Remove path from dependencies  
