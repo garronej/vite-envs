@@ -4,8 +4,9 @@
     "config:base"
   ],
   "rangeStrategy": "bump",
-  "ignorePaths": [".github/**"],
+  "ignorePaths": [".github/**", "res/**"],
   "bumpVersion": "patch",
+  "branchPrefix": "renovate_",
   "packageRules": [
     {
       "packagePatterns": ["*"],
@@ -14,9 +15,10 @@
     },
     {
       "packagePatterns": ["minimal-polyfills"],
-      "groupName": "homegrown",
       "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
+      "automerge": true,
+      "automergeType": "branch",
+      "groupName": "garronej_modules_update"
     }
   ]
 }
