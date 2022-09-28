@@ -171,8 +171,8 @@ the `build/` dir, for example with `serve -s build` you will get this in the con
 ```json
 {
     "FOO": "Default value of foo",
-    "BAR": "Value of baz on the server",
-    "BAZ": "",
+    "BAR": "",
+    "BAZ": "Value of baz on the server",
     "FIZZ": ""
 }
 ```
