@@ -37,7 +37,6 @@ Then access `FOO`:
 # Features
 
 - ✅ No impact on the startup time.
-- ✅ No impact on the Docker image size.  
 - ✅ Require no network connection at container startups.
 - ✅ Secure: It only injects the envs declared in the `.env` file.  
 - ✅ It works like you are already used to. It just changes **when** the envs are injected.  
