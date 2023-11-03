@@ -23,6 +23,7 @@
 
 Create-react-app [supports environment variable](https://create-react-app.dev/docs/adding-custom-environment-variables/) but they are bundled at build time when `yarn build` is run.  
 If we want to change anything like the URL of the backend the app should connect to, we have to rebuild, we can't ship customizable Docker image of our CRA apps.  
+In practice CRA-ENVS enable to turn a statically build React project into a configurable webapp.  
 
 The solution would be to be able to do:  
 ```bash
@@ -30,7 +31,7 @@ The solution would be to be able to do:
  ```
 Then access `FOO`:  
 - In the code like `process.env["FOO"]` 
-- In `public/index.html` like `<title>%FOO%</title>`
+- In `public/index.html` like `<title>%FOO%</title>` or `<title><%= process.env.FOO %></title>`
 
 `cra-envs` does just that, in a secure, performant and type safe way.  
 
@@ -41,8 +42,16 @@ Then access `FOO`:
 - ✅ Secure: It only injects the envs declared in the `.env` file.  
 - ✅ It works like you are already used to. It just changes **when** the envs are injected.  
 - ✅  EJS support in `public/index.html` ([did you know?](https://github.com/facebook/create-react-app/issues/3112#issuecomment-328829771)).  
-This enables for example to conditionally [preload one font or another](https://github.com/garronej/cra-envs-demo-app/blob/e1aa8067b52a563bc5db18558e7ed7746a56c9c0/public/index.html#L6-L21)  
+This enables to server render your index.html at container startup [example usage: Enable your font to be customized](https://github.com/InseeFrLab/onyxia/blob/beafadd3bd5183ce2b5a0928ee2ef1dc6212d121/web/public/index.html#L41-L88).  
 - ✅ (Optional) Type safe: An env getter is generated so [you know what envs are available](https://user-images.githubusercontent.com/6702424/154802407-92d2d0b7-b74c-4b35-a2b5-5c27c26d5127.png).  
+
+# Drawbacks
+
+Using `cra-envs` will complicate your [Dockerfile](https://github.com/etalab/cra-envs-demo-app/blob/main/Dockerfile) and necessitate the inclusion of Node.js alongside 
+Nginx in your Docker image. This adds an additional 58MB for Node.js, which is necessary for server-rendering `public/index.html` at the container's startup.
+
+If server-rendering `index.html` (as a EJS template) is not on your agenda (though it may become a requirement in the future), you may want 
+to consider [import-meta-envs](https://import-meta-env.org/) for a solution with a smaller impact on your Docker image's size.
 
 
 # Usecase example
