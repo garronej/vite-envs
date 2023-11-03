@@ -87,11 +87,17 @@ if (indexHtmlPublicFilePath !== undefined) {
         })()
     };
 
-    str = ejs.render(str, {
-        "process": {
-            "env": resolvedEnvsWithReactAppPrefix
+    str = ejs.render(
+        str,
+        {
+            "process": {
+                "env": resolvedEnvsWithReactAppPrefix
+            },
+        },
+        {
+            "escape": str => str
         }
-    });
+    );
 
     str = multiReplace({
         "input": str,
