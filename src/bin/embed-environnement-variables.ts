@@ -87,18 +87,18 @@ if (indexHtmlPublicFilePath !== undefined) {
         })()
     };
 
+    str = ejs.render(str, {
+        "process": {
+            "env": resolvedEnvsWithReactAppPrefix
+        }
+    });
+
     str = multiReplace({
         "input": str,
         "keyValues": Object.fromEntries(
             Object.entries(resolvedEnvsWithReactAppPrefix)
                 .map(([key, value]) => [`%${key}%`, value])
         )
-    });
-
-    str = ejs.render(str, {
-        "process": {
-            "env": resolvedEnvsWithReactAppPrefix
-        }
     });
 
     const $_public = cheerio.load(str);
