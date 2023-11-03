@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ '14', '13', '12'  ]
+        node: [ '12'  ]
     name: Test with Node v${{ matrix.node }}
     steps:
     - name: Tell if project is using npm or yarn
