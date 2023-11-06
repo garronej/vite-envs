@@ -15,15 +15,17 @@ const binDirPath = pathJoin(getProjectRoot(), "dist", "bin");
 
 st.enableCmdTrace();
 
+const nodePath = process.argv[0];
+
 ["", " js"].forEach(arg =>
     st.execSyncTrace(
-        `node ${pathJoin(binDirPath, "generate-env-getter.js")}${arg}`,
+        `${nodePath} ${pathJoin(binDirPath, "generate-env-getter.js")}${arg}`,
         { "cwd": sampleProjectDirPath }
     )
 );
 
 st.execSyncTrace(
-    `node ${pathJoin(binDirPath, "embed-environnement-variables.js")}`,
+    `${nodePath} ${pathJoin(binDirPath, "embed-environnement-variables.js")}`,
     {
         "cwd": sampleProjectDirPath,
         "env": {
