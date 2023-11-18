@@ -55,7 +55,7 @@ const { resolvedEnvs } = (() => {
 
 let $: CheerioAPI | undefined = cheerio.load(fs.readFileSync(indexHtmlFilePath).toString("utf8"));
 
-const indexHtmlPublicFilePath= [ pathJoin(targetProjectDirPath, "public", "index.html") ].find(fs.existsSync);
+const indexHtmlPublicFilePath = [pathJoin(targetProjectDirPath, "public", "index.html")].find(fs.existsSync);
 
 if (indexHtmlPublicFilePath !== undefined) {
 
@@ -66,17 +66,17 @@ if (indexHtmlPublicFilePath !== undefined) {
             Object.entries(resolvedEnvs)
                 .map(([key, value]) => [`REACT_APP_${key}`, value])
         ),
-        "PUBLIC_URL": (()=>{
+        "PUBLIC_URL": (() => {
 
-            const packageJsonFilePath = [pathJoin( targetProjectDirPath, "package.json")].find(fs.existsSync);
+            const packageJsonFilePath = [pathJoin(targetProjectDirPath, "package.json")].find(fs.existsSync);
 
-            if( !packageJsonFilePath ){
+            if (!packageJsonFilePath) {
                 return "";
             }
 
             const { homepage } = JSON.parse(fs.readFileSync(packageJsonFilePath).toString("utf8"));
 
-            if( homepage === undefined ){
+            if (homepage === undefined) {
                 return "";
             }
 
@@ -118,17 +118,33 @@ if (indexHtmlPublicFilePath !== undefined) {
 
 }
 
-const domId = "environnement-variables";
 
-$(`head > #${domId}`).remove();
+const scriptPropertyKey = "data-script-description";
+const scriptPropertyValue = "Env injected by embed-environnement-variables, a script of cra-envs";
 
-$("head").prepend(
-    [
-        `<script id="${domId}">`,
-        `   window["${nameOfTheGlobal}"]= ${JSON.stringify(resolvedEnvs)};`,
-        `</script>`
-    ].join("\n")
-);
+$(`script[${scriptPropertyKey}="${scriptPropertyValue}"]`).remove();
+
+const newScript = [
+    `<script ${scriptPropertyKey}="${scriptPropertyValue}">`,
+    `   window["${nameOfTheGlobal}"]= ${JSON.stringify(resolvedEnvs)};`,
+    `</script>`
+].join("\n");
+
+
+{
+
+    const firstScriptTag = $("head script").first();
+
+    if (firstScriptTag.length !== 0) {
+        // If a script tag exists, prepend the new script before the first script tag
+        firstScriptTag.before(newScript);
+    } else {
+        // If no script tag exists, append the new script to the head
+        $("head").append(newScript);
+    }
+
+}
+
 
 fs.writeFileSync(
     indexHtmlFilePath,
