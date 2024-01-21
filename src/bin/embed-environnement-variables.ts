@@ -126,7 +126,7 @@ $(`script[${scriptPropertyKey}="${scriptPropertyValue}"]`).remove();
 
 const newScript = [
     `<script ${scriptPropertyKey}="${scriptPropertyValue}">`,
-    `   window["${nameOfTheGlobal}"]= ${JSON.stringify(resolvedEnvs)};`,
+    `   window["${nameOfTheGlobal}"]= ${JSON.stringify(JSON.stringify(resolvedEnvs))};`,
     `</script>`
 ].join("\n");
 
