@@ -7,7 +7,7 @@ export function getEnvVarValue(envVarName: string): string {
 
     read_from_cra_envs: {
 
-        const objectDefinedByThisModuleJson: string | undefined = (window as any)["__cra-envs-json__" satisfies typeof ofTypenameOfTheGlobal] ?? undefined;
+        const objectDefinedByThisModuleJson: string | undefined = (window as any)["__vite-envs-json__" satisfies typeof ofTypenameOfTheGlobal] ?? undefined;
 
         if (objectDefinedByThisModuleJson === undefined) {
             break read_from_cra_envs;
@@ -20,7 +20,7 @@ export function getEnvVarValue(envVarName: string): string {
         const value= objectDefinedByThisModule[envVarName];
 
         if( value === undefined ) {
-            throw new Error(`Wrong assertion, __cra-envs-json__ wasn't properly defined`);
+            throw new Error(`Wrong assertion, __vite-envs-json__ wasn't properly defined`);
         }
 
         return value;

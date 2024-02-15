@@ -1,2 +1,2 @@
 
-export const nameOfTheGlobal= "__cra-envs-json__";
+export const nameOfTheGlobal= "__vite-envs-json__";

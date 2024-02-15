@@ -120,7 +120,7 @@ if (indexHtmlPublicFilePath !== undefined) {
 
 
 const scriptPropertyKey = "data-script-description";
-const scriptPropertyValue = "Env injected by embed-environnement-variables, a script of cra-envs";
+const scriptPropertyValue = "Env injected by embed-environnement-variables, a script of vite-envs";
 
 $(`script[${scriptPropertyKey}="${scriptPropertyValue}"]`).remove();
 

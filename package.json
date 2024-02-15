@@ -1,10 +1,10 @@
 {
-    "name": "cra-envs",
+    "name": "vite-envs",
     "version": "2.1.2",
     "description": "Script for embedding server variable in CRA apps without having to rebuild.",
     "repository": {
         "type": "git",
-        "url": "git://github.com/garronej/cra-envs.git"
+        "url": "git://github.com/garronej/vite-envs.git"
     },
     "main": "dist/lib/index.js",
     "types": "dist/lib/index.d.ts",
@@ -15,16 +15,13 @@
         "link-in-app": "yarn build && ts-node --skipProject scripts/link-in-app.ts"
     },
     "bin": {
-        "generate-env-getter": "dist/bin/generate-env-getter.js",
-        "embed-environnement-variables": "dist/bin/embed-environnement-variables.js"
+        "vite-envs": "dist/bin/vite-envs.js"
     },
     "author": "u/garronej",
     "license": "MIT",
     "files": [
         "src/",
-        "!src/test/",
         "dist/",
-        "!dist/test/",
         "!dist/tsconfig.tsbuildinfo"
     ],
     "keywords": [
@@ -33,9 +30,8 @@
         "environment-variables",
         "typescript"
     ],
-    "homepage": "https://github.com/garronej/cra-envs",
+    "homepage": "https://github.com/garronej/vite-envs",
     "dependencies": {
-        "scripting-tools": "^0.19.14",
         "cheerio": "1.0.0-rc.12",
         "dotenv": "^8.2.0",
         "ejs": "^3.1.6",
