@@ -312,11 +312,6 @@ parse5@^7.0.0:
   dependencies:
     entities "^4.4.0"
 
-scripting-tools@^0.19.14:
-  version "0.19.14"
-  resolved "https://registry.yarnpkg.com/scripting-tools/-/scripting-tools-0.19.14.tgz#d46cdea3dcf042b103b1712103b007e72c4901d5"
-  integrity sha512-KGRES70dEmcaCdpx3R88bLWmfA4mQ/EGikCQy0FGTZwx3y9F5yYkzEhwp02+ZTgpvF25JcNOhDBbOqL6z92kwg==
-
 supports-color@^7.1.0:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-7.2.0.tgz#1b7dcdcb32b8138801b3e478ba6a51caa89648da"

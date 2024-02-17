@@ -78,5 +78,6 @@ Here are two deployment example:
 
 # Documentation
 
-Find 👉[**here**](https://github.com/garronej/vite-envs-demo-app)👈 a demo/starter setup for:  
-`vite-envs` + `Vite` + `TypeScript` + `Nginx` + `Docker`
+The usage documentation is the README of the the starter project:  
+
+👉[**garronej/vite-envs-demo-app**](https://github.com/garronej/vite-envs-demo-app)👈  
