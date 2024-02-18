@@ -2,7 +2,7 @@
     <img src="https://github.com/garronej/vite-envs/assets/6702424/0f290fd7-19ea-41e6-97fb-da3fcc79d848">  
 </p>
 <p align="center">
-    <i>Bundle environment variables in Vite at <strike>build time</strike> <b> launch time</b>!</i>
+    <i>Bundle environment variables in Vite at <strike>build time</strike> <b> when you start serving your app</b>!</i>
     <br>
     <br>
     <a href="https://github.com/garronej/vite-envs/actions">
@@ -29,21 +29,22 @@ What if you want to allow the individual deploying your web app to configure the
 docker run --env FOO="xyz" my-org/my-vite-app
 ```
 
-Then, access `FOO`:  
-- In your code, as `import.meta.env.FOO`
-- In `index.html`, like `<title>%FOO%</title>` or `<title><%= process.env.FOO %></title>` (EJS)
+Then, access `FOO`:
+
+-   In your code, as `import.meta.env.FOO`
+-   In `index.html`, like `<title>%FOO%</title>` or `<title><%= process.env.FOO %></title>` (EJS)
 
 This method eliminates the need to rebuild your web app each time you wish to change some configuration.  
 More importantly, it allows you to distribute a customizable Docker image of your web app!
 
 # Features
 
-- ✅ Does not impact startup time.
-- ✅ Requires no network connection at container startup.
-- ✅ Secure: Only injects the envs declared in the `.env` file
-- ✅ Brings type safety to your environment variables.
-- ✅ Enable to dynamically generate `<head />` tags by rendering your `index.html` as an EJS template at container startup. Great for SEO.  
-- ✅ Easy to set up, without breaking your Storybook or other tools in place.
+-   ✅ Does not impact startup time.
+-   ✅ Requires no network connection at container startup.
+-   ✅ Secure: Only injects the envs declared in the `.env` file
+-   ✅ Brings type safety to your environment variables.
+-   ✅ Enable to dynamically generate `<head />` tags by rendering your `index.html` as an EJS template at container startup. Great for SEO.
+-   ✅ Easy to set up, without breaking your Storybook or other tools in place.
 
 # Drawbacks
 
@@ -58,13 +59,13 @@ If this is the case, please feel free to open an issue about it.
 	<img src="https://user-images.githubusercontent.com/6702424/154810177-3da80638-93c3-4a41-9710-13541b9d8974.png" />
 </p>
 
-[Onyxia](https://github.com/InseeFrLab/onyxia) is a Vite app distributed as a [Docker image](https://hub.docker.com/r/inseefrlab/onyxia-web/tags).  
+[Onyxia](https://github.com/InseeFrLab/onyxia) is a Vite app distributed as a [Docker image](https://hub.docker.com/r/inseefrlab/onyxia-web/tags).
 
 Sysadmins that would like to deploy Onyxia on their infrastructure can simply use
 [the official Docker image](https://hub.docker.com/r/inseefrlab/onyxia-web/tags) and provide relevant environnement variable to adjust the theme/branding of the website to their usecase as
-documented [here](https://docs.onyxia.sh/admin-doc/theme).  
+documented [here](https://docs.onyxia.sh/admin-doc/theme).
 
-Here are two deployment example:  
+Here are two deployment example:
 
 <p align="center">
   <a href="https://datalab.sspcloud.fr">
@@ -78,6 +79,6 @@ Here are two deployment example:
 
 # Documentation
 
-The usage documentation is the README of the the starter project:  
+The usage documentation is the README of the the starter project:
 
-👉[**garronej/vite-envs-demo-app**](https://github.com/garronej/vite-envs-demo-app)👈  
+👉[**garronej/vite-envs-demo-app**](https://github.com/garronej/vite-envs-demo-app)👈

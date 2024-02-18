@@ -1,8 +1,9 @@
 {
     "compilerOptions": {
         "module": "CommonJS",
-        "target": "ES6",
-        "lib": ["es2015", "DOM", "esnext"],
+        "target": "ES2019",
+        "moduleResolution": "node",
+        "lib": ["es2019"],
         "esModuleInterop": true,
         "declaration": true,
         "outDir": "./dist",
@@ -17,6 +18,5 @@
         "noFallthroughCasesInSwitch": true,
         "skipLibCheck": true
     },
-    "include": ["src"],
-    "exclude": ["src/stories"]
+    "include": ["src"]
 }

@@ -2,7 +2,7 @@ import { execSync } from "child_process";
 import { join as pathJoin, relative as pathRelative } from "path";
 import * as fs from "fs";
 
-const singletonDependencies: string[] = [];
+const singletonDependencies: string[] = ["vite"];
 
 const rootDirPath = pathJoin(__dirname, "..");
 
@@ -13,49 +13,37 @@ fs.writeFileSync(
         JSON.stringify(
             (() => {
                 const packageJsonParsed = JSON.parse(
-                    fs
-                        .readFileSync(pathJoin(rootDirPath, "package.json"))
-                        .toString("utf8"),
+                    fs.readFileSync(pathJoin(rootDirPath, "package.json")).toString("utf8")
                 );
 
                 return {
                     ...packageJsonParsed,
                     "main": packageJsonParsed["main"]?.replace(/^dist\//, ""),
                     "types": packageJsonParsed["types"]?.replace(/^dist\//, ""),
-                    "module": packageJsonParsed["module"]?.replace(
-                        /^dist\//,
-                        "",
-                    ),
+                    "module": packageJsonParsed["module"]?.replace(/^dist\//, ""),
                     "bin": !("bin" in packageJsonParsed)
                         ? undefined
                         : Object.fromEntries(
-                              Object.entries(packageJsonParsed["bin"]).map(
-                                  ([key, value]) => [
-                                      key,
-                                      (value as string).replace(/^dist\//, ""),
-                                  ],
-                              ),
+                              Object.entries(packageJsonParsed["bin"]).map(([key, value]) => [
+                                  key,
+                                  (value as string).replace(/^dist\//, "")
+                              ])
                           ),
                     "exports": !("exports" in packageJsonParsed)
                         ? undefined
                         : Object.fromEntries(
-                              Object.entries(packageJsonParsed["exports"]).map(
-                                  ([key, value]) => [
-                                      key,
-                                      (value as string).replace(
-                                          /^\.\/dist\//,
-                                          "./",
-                                      ),
-                                  ],
-                              ),
-                          ),
+                              Object.entries(packageJsonParsed["exports"]).map(([key, value]) => [
+                                  key,
+                                  (value as string).replace(/^\.\/dist\//, "./")
+                              ])
+                          )
                 };
             })(),
             null,
-            2,
+            2
         ),
-        "utf8",
-    ),
+        "utf8"
+    )
 );
 
 const commonThirdPartyDeps = (() => {
@@ -68,20 +56,11 @@ const commonThirdPartyDeps = (() => {
         ...namespaceSingletonDependencies
             .map(namespaceModuleName =>
                 fs
-                    .readdirSync(
-                        pathJoin(
-                            rootDirPath,
-                            "node_modules",
-                            namespaceModuleName,
-                        ),
-                    )
-                    .map(
-                        submoduleName =>
-                            `${namespaceModuleName}/${submoduleName}`,
-                    ),
+                    .readdirSync(pathJoin(rootDirPath, "node_modules", namespaceModuleName))
+                    .map(submoduleName => `${namespaceModuleName}/${submoduleName}`)
             )
             .reduce((prev, curr) => [...prev, ...curr], []),
-        ...singletonDependencies,
+        ...singletonDependencies
     ];
 })();
 
@@ -96,9 +75,7 @@ const execYarnLink = (params: { targetModuleName?: string; cwd: string }) => {
     const cmd = [
         "yarn",
         "link",
-        ...(targetModuleName !== undefined
-            ? [targetModuleName]
-            : ["--no-bin-links"]),
+        ...(targetModuleName !== undefined ? [targetModuleName] : ["--no-bin-links"])
     ].join(" ");
 
     console.log(`$ cd ${pathRelative(rootDirPath, cwd) || "."} && ${cmd}`);
@@ -107,8 +84,8 @@ const execYarnLink = (params: { targetModuleName?: string; cwd: string }) => {
         cwd,
         "env": {
             ...process.env,
-            "HOME": yarnGlobalDirPath,
-        },
+            "HOME": yarnGlobalDirPath
+        }
     });
 };
 
@@ -123,9 +100,7 @@ const testAppPaths = (() => {
                 return testAppPath;
             }
 
-            console.warn(
-                `Skipping ${testAppName} since it cant be found here: ${testAppPath}`,
-            );
+            console.warn(`Skipping ${testAppName} since it cant be found here: ${testAppPath}`);
 
             return undefined;
         })
@@ -137,9 +112,7 @@ if (testAppPaths.length === 0) {
     process.exit(-1);
 }
 
-testAppPaths.forEach(testAppPath =>
-    execSync("yarn install", { "cwd": testAppPath }),
-);
+testAppPaths.forEach(testAppPath => execSync("yarn install", { "cwd": testAppPath }));
 
 console.log("=== Linking common dependencies ===");
 
@@ -157,8 +130,8 @@ commonThirdPartyDeps.forEach(commonThirdPartyDep => {
             "node_modules",
             ...(commonThirdPartyDep.startsWith("@")
                 ? commonThirdPartyDep.split("/")
-                : [commonThirdPartyDep]),
-        ],
+                : [commonThirdPartyDep])
+        ]
     );
 
     execYarnLink({ "cwd": localInstallPath });
@@ -168,9 +141,9 @@ commonThirdPartyDeps.forEach(commonThirdPartyDep =>
     testAppPaths.forEach(testAppPath =>
         execYarnLink({
             "cwd": testAppPath,
-            "targetModuleName": commonThirdPartyDep,
-        }),
-    ),
+            "targetModuleName": commonThirdPartyDep
+        })
+    )
 );
 
 console.log("=== Linking in house dependencies ===");
@@ -181,11 +154,9 @@ testAppPaths.forEach(testAppPath =>
     execYarnLink({
         "cwd": testAppPath,
         "targetModuleName": JSON.parse(
-            fs
-                .readFileSync(pathJoin(rootDirPath, "package.json"))
-                .toString("utf8"),
-        )["name"],
-    }),
+            fs.readFileSync(pathJoin(rootDirPath, "package.json")).toString("utf8")
+        )["name"]
+    })
 );
 
 export {};

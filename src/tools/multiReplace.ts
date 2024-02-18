@@ -1,41 +1,29 @@
 import * as crypto from "crypto";
 
+export function multiReplace(params: { input: string; keyValues: Record<string, string> }) {
+    const { input, keyValues } = params;
 
-export function multiReplace(
-	params: {
-		input: string;
-		keyValues: Record<string, string>;
-	}
-) {
+    let output = input;
 
-	const { input, keyValues } = params;
+    const keyByHash = new Map<string, string>();
 
-	let output = input;
+    Object.keys(keyValues).forEach(key => {
+        const hash = crypto.createHash("sha256").update(key).digest("hex");
 
-	const keyByHash = new Map<string, string>();
+        const newOutput = output.replace(new RegExp(key, "g"), hash);
 
-	Object.keys(keyValues).forEach(key => {
-		const hash = crypto
-			.createHash("sha256")
-			.update(key)
-			.digest("hex");
+        if (newOutput === output) {
+            return;
+        }
 
-		const newOutput = output.replace(new RegExp(key, "g"), hash);
+        keyByHash.set(hash, key);
 
-		if (newOutput === output) {
-			return;
-		}
+        output = newOutput;
+    });
 
-		keyByHash.set(hash, key);
+    Array.from(keyByHash.entries()).forEach(
+        ([hash, key]) => (output = output.replace(new RegExp(hash, "g"), keyValues[key]))
+    );
 
-		output = newOutput;
-
-	});
-
-	Array.from(keyByHash.entries()).forEach(([hash, key])=> 
-		output = output.replace(new RegExp(hash, "g"), keyValues[key])
-	);
-
-	return output;
-
+    return output;
 }
