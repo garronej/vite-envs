@@ -1,6 +1,6 @@
 {
     "name": "vite-envs",
-    "version": "2.1.2",
+    "version": "3.0.0",
     "description": "Script for embedding server variable in CRA apps without having to rebuild.",
     "repository": {
         "type": "git",
@@ -10,6 +10,7 @@
         "build": "tsc && yarn grant-exec-perms",
         "grant-exec-perms": "node dist/tools/grant-exec-perms.js",
         "link-in-app": "ts-node --skipProject scripts/link-in-app.ts",
+        "link-in-demo-app": "yarn link-in-app vite-envs-demo-app",
         "_format": "prettier '**/*.{ts,tsx,json,md}'",
         "format": "yarn _format --write",
         "format:check": "yarn _format --list-different"
