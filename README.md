@@ -32,7 +32,7 @@ docker run --env FOO="xyz" my-org/my-vite-app
 Then, access `FOO`:
 
 -   In your code, as `import.meta.env.FOO`
--   In `index.html`, like `<title>%FOO%</title>` or `<title><%= process.env.FOO %></title>` (EJS)
+-   In `index.html`, like `<title>%FOO%</title>` or `<title><%= env.FOO %></title>` (EJS)
 
 This method eliminates the need to rebuild your web app each time you wish to change some configuration.  
 More importantly, it allows you to distribute a customizable Docker image of your web app!
