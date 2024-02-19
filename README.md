@@ -22,7 +22,8 @@
 # Motivation
 
 In Vite, `import.meta.env` variables are set at build time with `vite build`.  
-How can we let deployers configure these variables post-build for flexible deployments?  
+However we often want to enable the person deploying the app to define those values, we don't want to re build every time we need
+to change a configuration.  
 `vite-envs` facilitates this by enabling to:
 
 ```bash
@@ -71,11 +72,14 @@ docker run \
     <head>
         <title>%TITLE%</title>
 
-        <!-- JSON5 is made available by vite-envs, it's a more permissive JSON 
-         format that is well fitted for configuration wrote by humans -->
-        <% const obj = JSON5.parse(import.meta.env.CUSTOM_META_TAGS); %> <% for (const [key, value] of
-        Object.entries(obj)) { %>
-        <meta name="<%= key %>" content="<%= value %>" />
+        <!-- 
+         JSON5 is made available by vite-envs, it's a more permissive JSON 
+         format that is well fitted for configuration wrote by humans.
+         You can also use YAML.parse()
+         -->
+        <% const obj = JSON5.parse(import.meta.env.CUSTOM_META_TAGS); %> 
+        <% for (const [key, value] of Object.entries(obj)) { %>
+          <meta name="<%= key %>" content="<%= value %>" />
         <% } %>
     </head>
 </html>
@@ -84,6 +88,48 @@ docker run \
 A side effect of `vite-envs` processing your `index.html` post build is that
 it might not integrate smoothly with other plugins that would also transform the HTML.  
 If this occurs, please do not hesitate to open an issue about it.
+
+
+# Trade-offs
+
+Incorporating `vite-envs` into your project necessitates minor modifications to your Dockerfile, 
+specifically [adding a few lines](https://github.com/garronej/vite-envs-starter/blob/3a4f8a4dc1877a631060900db27e5388520d64a5/Dockerfile#L15-L16) 
+and [embedding Node.js within your Nginx Docker image](https://github.com/garronej/vite-envs-starter/blob/3a4f8a4dc1877a631060900db27e5388520d64a5/Dockerfile#L11), 
+increasing the image size by 58MB. 
+This inclusion is crucial for dynamically rendering the `index.html` during container startup, enhancing SEO by ensuring 
+essential meta tags are present in the `<head />` for social media previews and analytics.
+
+For instance, to dynamically set titles and custom meta tags, you can use:
+
+```bash
+docker run \
+  --env TITLE='My Org Dashboard' \
+  --env CUSTOM_META_TAGS='{ description: "Org Dashboard for X and Y" }' \
+  my-org/my-vite-app
+```
+
+`index.html`
+```html
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>%TITLE%</title>
+
+        <!-- 
+         JSON5 is made available by vite-envs, it's a more permissive JSON 
+         format that is well fitted for configuration wrote by humans.
+         You can also use YAML.parse()
+         -->
+        <% const obj = JSON5.parse(import.meta.env.CUSTOM_META_TAGS); %> 
+        <% for (const [key, value] of Object.entries(obj)) { %>
+          <meta name="<%= key %>" content="<%= value %>" />
+        <% } %>
+    </head>
+</html>
+```
+
+Be aware that `vite-envs` might conflict with other plugins transforming `index.html`.  
+If you encounter any issues, please report them, and I will endeavor to provide a solution promptly.  
 
 # Alternative
 
