@@ -52,46 +52,6 @@ More importantly, it allows you to ship a customizable Docker image of your weba
 
 # Trade-offs
 
-Using `vite-envs` requires adding [a few extra lines to your Dockerfile](https://github.com/garronej/vite-envs-starter/blob/3a4f8a4dc1877a631060900db27e5388520d64a5/Dockerfile#L15-L16) and [including Node.js in your Nginx-based Docker image](https://github.com/garronej/vite-envs-starter/blob/3a4f8a4dc1877a631060900db27e5388520d64a5/Dockerfile#L11), which adds an additional 58MB to your Docker image.  
-The trade-off of including Node.js is justified by the necessity to re-render the `index.html` at container startup.  
-It is very important for SEO that certain tags be present in the `<head />` section from the outset for social media previews or analytics tools.  
-We want, for example to be able to do:
-
-```bash
-docker run \
-  --env TITLE='My Org Dashboard' \
-  --env CUSTOM_META_TAGS='{ description: "Org Dashboard for X and Y" }' \
-  my-org/my-vite-app
-```
-
-`index.html`
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <title>%TITLE%</title>
-
-        <!-- 
-         JSON5 is made available by vite-envs, it's a more permissive JSON 
-         format that is well fitted for configuration wrote by humans.
-         You can also use YAML.parse()
-         -->
-        <% const obj = JSON5.parse(import.meta.env.CUSTOM_META_TAGS); %> 
-        <% for (const [key, value] of Object.entries(obj)) { %>
-          <meta name="<%= key %>" content="<%= value %>" />
-        <% } %>
-    </head>
-</html>
-```
-
-A side effect of `vite-envs` processing your `index.html` post build is that
-it might not integrate smoothly with other plugins that would also transform the HTML.  
-If this occurs, please do not hesitate to open an issue about it.
-
-
-# Trade-offs
-
 Incorporating `vite-envs` into your project necessitates minor modifications to your Dockerfile, 
 specifically [adding a few lines](https://github.com/garronej/vite-envs-starter/blob/3a4f8a4dc1877a631060900db27e5388520d64a5/Dockerfile#L15-L16) 
 and [embedding Node.js within your Nginx Docker image](https://github.com/garronej/vite-envs-starter/blob/3a4f8a4dc1877a631060900db27e5388520d64a5/Dockerfile#L11), 
