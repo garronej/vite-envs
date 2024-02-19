@@ -125,6 +125,10 @@ export function viteEnvs() {
                         baseBuildTimeEnv
                     };
 
+                    if (!fs.existsSync(distDirPath)) {
+                        fs.mkdirSync(distDirPath, { "recursive": true });
+                    }
+
                     fs.writeFileSync(
                         pathJoin(distDirPath, viteEnvsMetaFileBasename),
                         JSON.stringify(viteEnvsMeta, undefined, 4)
