@@ -1,6 +1,7 @@
 import ejs from "ejs";
 import { multiReplace } from "./tools/multiReplace";
 import JSON5 from "json5";
+import YAML from "yaml";
 import { replaceAll } from "./tools/String.prototype.replaceAll";
 import * as cheerio from "cheerio";
 
@@ -15,7 +16,8 @@ export function renderHtmlAsEjs(params: { html: string; env: Record<string, stri
         renderedHtml,
         {
             [placeholder]: env,
-            JSON5
+            JSON5,
+            YAML
         },
         { "escape": str => str }
     );
