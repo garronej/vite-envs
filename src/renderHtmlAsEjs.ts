@@ -8,7 +8,11 @@ export function renderHtmlAsEjs(params: { html: string; env: Record<string, stri
     let renderedHtml = ejs.render(
         html,
         {
-            env,
+            "import": {
+                "meta": {
+                    env
+                }
+            },
             JSON5
         },
         { "escape": str => str }
