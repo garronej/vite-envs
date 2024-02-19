@@ -39,10 +39,10 @@ More importantly, it allows you to ship a customizable Docker image of your weba
 
 # Features
 
--   🔧 Effortless setup: Integrates smoothly without requiring modifications to your build system or disrupting your Storybook.
--   🔒 Secure: Only injects environment variables explicitly defined in the .env file.
+-   🔧 Effortless setup: Integrates smoothly, works as your already used to, does not disrupt your Storybook.
+-   🔒 Secure: Only injects environment variables explicitly defined in the `.env` file.
 -   🛡️ Type-safe: Automatically provides type definition for `import.meta.env`.
--   📦 `import.meta.env` is an object, not a placeholder. You can do `Object.keys(import.meta.env)` for example.
+-   📦 `import.meta.env` is an object, not a placeholder. `Object.keys(import.meta.env)` works.
 -   🌐 SEO-friendly: Supports dynamic generation of `<head />` tags by treating `index.html` as an EJS template.
 
 # Documentation
@@ -81,8 +81,8 @@ docker run \
 </html>
 ```
 
-The fact that vite-envs processes your HTML index as an EJS template also means it might not integrate smoothly with other
-plugins that modify the index.html.  
+A side effect of `vite-envs` processing your `index.html` post build is that
+it might not integrate smoothly with other plugins that would also transform the HTML.  
 If this occurs, please do not hesitate to open an issue about it.
 
 # Alternative
