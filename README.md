@@ -2,7 +2,7 @@
     <img src="https://github.com/garronej/vite-envs/assets/6702424/0f290fd7-19ea-41e6-97fb-da3fcc79d848">  
 </p>
 <p align="center">
-    <i>Bundle environment variables in Vite at <strike>build time</strike> <b> when you start serving your app</b>!</i>
+    <i>Bundle environment variables in Vite at <strike>build time</strike> <b> startup time</b>!</i>
     <br>
     <br>
     <a href="https://github.com/garronej/vite-envs/actions">
@@ -21,7 +21,7 @@
 
 # Motivation
 
-In a Vite environment, variables (`import.meta.env.VITE_FOO`) are embedded into your static website at build time when you execute `vite build`.  
+In Vite, variables (`import.meta.env.VITE_FOO`) are embedded into your static website at build time, when you execute `vite build`.  
 What if you want to allow the individual deploying your web app to configure the environment variables?  
 `vite-envs` facilitates this by enabling you to:
 
@@ -42,9 +42,10 @@ More importantly, it allows you to distribute a customizable Docker image of you
 -   ✅ Easy to setup, does not require you to rethink your build system, does not break your Storybook.
 -   ✅ Secure: Only injects the envs declared in the `.env` file
 -   ✅ Brings type safety to your environment variables (`import.meta.env` gets type definition).
+-   ✅ `import.meta.env` is an object, not a placeholder. You can do `Object.keys(import.meta.env)` for example.
+-   ✅ SEO: Enable to dynamically generate `<head />` tags by rendering your `index.html` as an EJS template.
 -   ✅ Requires no network connection at container startup.
 -   ✅ No impact on container startup time.
--   ✅ SEO: Enable to dynamically generate `<head />` tags by rendering your `index.html` as an EJS template.
 
 # Drawbacks
 
@@ -129,4 +130,4 @@ Here are two deployment example:
 
 The usage documentation is the README of the the starter project:
 
-👉[**garronej/vite-envs-demo-app**](https://github.com/garronej/vite-envs-demo-app)👈
+👉[**vite-envs-starter**](https://github.com/garronej/vite-envs-starter)👈
