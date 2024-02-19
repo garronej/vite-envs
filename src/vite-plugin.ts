@@ -70,13 +70,13 @@ export function viteEnvs() {
             {
                 const dTsFilePath = pathJoin(appRootDirPath, "src", "vite-env.d.ts");
 
-                const dTsFileContent = !fs.existsSync(dTsFilePath)
+                let dTsFileContent = !fs.existsSync(dTsFilePath)
                     ? `/// <reference types="vite/client" />\n`
                     : fs.readFileSync(dTsFilePath).toString("utf8");
 
-                dTsFileContent.replace(/interface ImportMetaEnv {[^}]*}/g, "");
+                dTsFileContent = dTsFileContent.replace(/interface ImportMetaEnv {[^}]*}/g, "");
 
-                dTsFileContent.replace(/interface ImportMeta {[^}]*}/g, "");
+                dTsFileContent = dTsFileContent.replace(/interface ImportMeta {[^}]*}/g, "");
 
                 fs.writeFileSync(
                     dTsFilePath,
@@ -102,17 +102,19 @@ export function viteEnvs() {
                 }
             }
 
-            if (resolvedConfig.command !== "build") {
-                return;
-            }
+            define_build_infos: {
+                if (resolvedConfig.command !== "build") {
+                    break define_build_infos;
+                }
 
-            resultOfConfigResolved.buildInfos = {
-                "distDirPath": pathJoin(appRootDirPath, resolvedConfig.build.outDir),
-                "assetsUrlPath": posixPath.join(
-                    resolvedConfig.env.BASE_URL,
-                    resolvedConfig.build.assetsDir
-                )
-            };
+                resultOfConfigResolved.buildInfos = {
+                    "distDirPath": pathJoin(appRootDirPath, resolvedConfig.build.outDir),
+                    "assetsUrlPath": posixPath.join(
+                        resolvedConfig.env.BASE_URL,
+                        resolvedConfig.build.assetsDir
+                    )
+                };
+            }
         },
         "transform": (code, id) => {
             assert(resultOfConfigResolved !== undefined);
