@@ -32,26 +32,74 @@ docker run --env FOO="xyz" my-org/my-vite-app
 Then, access `FOO`:
 
 -   In your code, as `import.meta.env.FOO`
--   In `index.html`, like `<title>%FOO%</title>` or `<title><%= env.FOO %></title>` (EJS)
+-   In `index.html`, like `<title>%FOO%</title>` or `<title><%= import.meta.env.FOO %></title>` (EJS)
 
 This method eliminates the need to rebuild your web app each time you wish to change some configuration.  
 More importantly, it allows you to distribute a customizable Docker image of your web app!
 
 # Features
 
--   ✅ Does not impact startup time.
--   ✅ Requires no network connection at container startup.
+-   ✅ Easy to setup, does not require you to rethink your build system, does not break your Storybook.
 -   ✅ Secure: Only injects the envs declared in the `.env` file
--   ✅ Brings type safety to your environment variables.
--   ✅ Enable to dynamically generate `<head />` tags by rendering your `index.html` as an EJS template at container startup. Great for SEO.
--   ✅ Easy to set up, without breaking your Storybook or other tools in place.
+-   ✅ Brings type safety to your environment variables (`import.meta.env` gets type definition).
+-   ✅ Requires no network connection at container startup.
+-   ✅ No impact on container startup time.
+-   ✅ SEO: Enable to dynamically generate `<head />` tags by rendering your `index.html` as an EJS template.
 
 # Drawbacks
 
-Using `vite-envs` requires adding [a few extra lines to your Dockerfile](https://github.com/garronej/vite-envs-demo-app/blob/400360c36acbb1fb703ab0ed185a6272482805e9/Dockerfile#L16-L17) and [including Node.js in your Nginx-based Docker image](https://github.com/garronej/vite-envs-demo-app/blob/400360c36acbb1fb703ab0ed185a6272482805e9/Dockerfile#L12), which adds an additional 58MB to your Docker image.
+Using `vite-envs` requires adding [a few extra lines to your Dockerfile](https://github.com/garronej/vite-envs-demo-app/blob/400360c36acbb1fb703ab0ed185a6272482805e9/Dockerfile#L16-L17) and [including Node.js in your Nginx-based Docker image](https://github.com/garronej/vite-envs-demo-app/blob/400360c36acbb1fb703ab0ed185a6272482805e9/Dockerfile#L12), which adds an additional 58MB to your Docker image.  
+The trade of of including node is justified by the fact that we need some way to re-render the index.html at
+container startup. It's verry important for SEO that some tag be present in the `<head />` from the getgo
+for social media preview or analitic tool.  
+We want to be able to execute some logic in the head based on the dynamic configuration of the web app, EJS
+is perfect for the job, we want to be able to write things like this:
 
-If you have Vite plugins that transform your HTML index, they might not be compatible with `vite-envs`.  
+```bash
+docker run \
+  --env TITLE='My org dasboard' \
+  --env CUSTOM_META_TAGS='{ description: "Org dasboard for X and Y" }' \
+  my-org/my-vite-app
+```
+
+`index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- ... -->
+
+        <title>%TITLE%</title>
+
+        <!-- JSON5 is made available by vite-envs, it's a more permissive JSON 
+         format that is well fitted for configuration wrote by humans -->
+        <% const obj = JSON5.parse(import.meta.env.CUSTOM_META_TAGS); %> <% for (const [key, value] of
+        Object.entries(obj)) { %>
+        <meta name="<%= key %>" content="<%= value %>" />
+        <% } %>
+    </head>
+</html>
+```
+
+The fact that `vite-envs` renders your HTML index as an EJS template also mean
+that it might not play well with other plugins that apply transformation to the `index.html`.  
 If this is the case, please feel free to open an issue about it.
+
+# Alternative
+
+There is another notable library that addresses the same problem: [import.meta.env](https://import-meta-env.org/).
+
+## Arguments in favor of `vite-envs`
+
+-   **Simpler to Set Up and Transparent:** The scope of [import.meta.env](https://import-meta-env.org/) is much broader, aiming to solve the problem of injecting environment variables into Single Page Applications (SPAs) in general. On the other hand, `vite-envs` focuses on a much narrower use case. It's specifically a Vite plugin designed for seamless integration with your Vite application. The setup process is straightforward and does not impact your Continuous Integration (CI) or build system.
+
+-   **Use Environment Variables in Your `index.html`:** `vite-envs` also supports performing substitutions and running Embedded JavaScript (EJS) in your `index.html` file, which is a must have SEO and preloading fonts for example.
+
+## Arguments in favor of `import.meta.env`
+
+-   **Minimal Impact on Bundle Size:** Unlike `vite-envs`, [which requires Node.js to be available on the host serving your static files](https://github.com/garronej/vite-envs-demo-app/blob/a4933fc6c190bf3c7033162cee5bcc2c2411ce09/Dockerfile#L12), `import.meta.env` does not affect the bundle size of your Docker image.
+    It generates a shell script at build time, which you can execute before serving the application, offering a lightweight solution without additional runtime dependencies.
 
 # Usecase example
 
