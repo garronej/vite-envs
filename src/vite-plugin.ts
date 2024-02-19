@@ -6,7 +6,7 @@ import * as fs from "fs";
 import * as dotenv from "dotenv";
 import * as cheerio from "cheerio";
 import { exclude } from "tsafe/exclude";
-import { nameOfTheGlobal, viteEnvsMetaFileBasename } from "./constants";
+import { nameOfTheGlobal, viteEnvsMetaFileBasename, updateTypingScriptEnvName } from "./constants";
 import { injectScriptToDefineGlobal } from "./injectScriptToDefineGlobal";
 import { renderHtmlAsEjs } from "./renderHtmlAsEjs";
 import type { ViteEnvsMeta } from "./ViteEnvsMeta";
@@ -81,6 +81,10 @@ export function viteEnvs() {
                     "utf8"
                 )
             );
+
+            if (updateTypingScriptEnvName in process.env) {
+                process.exit(0);
+            }
 
             if (resolvedConfig.command !== "build") {
                 return;
