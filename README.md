@@ -19,8 +19,8 @@
 # Motivation
 
 In Vite environment variables (`import.meta.env.VITE_FOO`) are embedded into the static website at build time,
-when `vite build` is ran.  
-What if we need to allow the person deploying the webapp to configure the environment variables?  
+when `vite build` is run.  
+But what if we need to allow the person deploying the webapp to configure the environment variables?  
 What if we want to build once and deploy in multiple configuration?  
 `vite-envs` facilitates this by enabling you to:
 
