@@ -28,6 +28,7 @@ export function viteEnvs() {
                   | undefined;
           }
         | undefined = undefined;
+    let htmlPre: string | undefined = undefined;
 
     const plugin = {
         "name": "vite-envs",
@@ -170,33 +171,8 @@ export function viteEnvs() {
                 const { baseBuildTimeEnv, env, envLocal, buildInfos, acceptedEnvVarNames } =
                     resultOfConfigResolved;
 
-                create_vite_envs_meta_file: {
-                    if (buildInfos === undefined) {
-                        break create_vite_envs_meta_file;
-                    }
-
-                    const { assetsUrlPath, distDirPath } = buildInfos;
-
-                    const viteEnvsMeta: ViteEnvsMeta = {
-                        "version": JSON.parse(
-                            fs
-                                .readFileSync(pathJoin(getThisCodebaseRootDirPath(), "package.json"))
-                                .toString("utf8")
-                        ).version,
-                        assetsUrlPath,
-                        "htmlPre": html,
-                        env,
-                        baseBuildTimeEnv
-                    };
-
-                    if (!fs.existsSync(distDirPath)) {
-                        fs.mkdirSync(distDirPath, { "recursive": true });
-                    }
-
-                    fs.writeFileSync(
-                        pathJoin(distDirPath, viteEnvsMetaFileBasename),
-                        JSON.stringify(viteEnvsMeta, undefined, 4)
-                    );
+                if (buildInfos !== undefined) {
+                    htmlPre = html;
                 }
 
                 const mergedEnv = {
@@ -226,6 +202,42 @@ export function viteEnvs() {
 
                 return $.html();
             }
+        },
+        "closeBundle": async () => {
+            assert(resultOfConfigResolved !== undefined);
+
+            const { baseBuildTimeEnv, env, buildInfos } = resultOfConfigResolved;
+
+            if (buildInfos === undefined) {
+                return;
+            }
+
+            assert(htmlPre !== undefined);
+
+            const { assetsUrlPath, distDirPath } = buildInfos;
+
+            const viteEnvsMeta: ViteEnvsMeta = {
+                "version": JSON.parse(
+                    fs
+                        .readFileSync(pathJoin(getThisCodebaseRootDirPath(), "package.json"))
+                        .toString("utf8")
+                ).version,
+                assetsUrlPath,
+                env,
+                baseBuildTimeEnv,
+                htmlPre
+            };
+
+            if (!fs.existsSync(distDirPath)) {
+                fs.mkdirSync(distDirPath, { "recursive": true });
+            }
+
+            console.log(pathJoin(distDirPath, viteEnvsMetaFileBasename));
+
+            fs.writeFileSync(
+                pathJoin(distDirPath, viteEnvsMetaFileBasename),
+                Buffer.from(JSON.stringify(viteEnvsMeta, null, 4), "utf8")
+            );
         }
     } satisfies Plugin;
 
