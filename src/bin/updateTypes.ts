@@ -8,5 +8,5 @@ export function updateTypes() {
             [updateTypingScriptEnvName]: ""
         }
     });
-    console.log("src/env.ts types updated");
+    console.log(`src/vite-env.d.ts has been updated`);
 }
