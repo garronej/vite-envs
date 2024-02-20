@@ -41,8 +41,9 @@ More importantly, it allows you to ship a customizable Docker image of your weba
 -   🔒 Secure: Only injects environment variables explicitly defined in the `.env` file.
 -   😌 The `VITE_` prefix isn't required.  
 -   🛡️ Type-safe: Type definition for your `import.meta.env`. Hot reload enabled!
--   📦 `import.meta.env` is an object, not a placeholder. `Object.keys(import.meta.env)` works.
 -   🌐 `index.html`: Use your envs in your HTML file.  
+-   📦 `import.meta.env` is an object, not a placeholder. `Object.keys(import.meta.env)` works.
+-   🧠 Supports computation of env default values at build time.  
 
 # Types  
 
