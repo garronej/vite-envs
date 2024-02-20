@@ -12,20 +12,16 @@ export function postBuildInjectionScript() {
         fs.readFileSync(pathJoin(process.cwd(), viteEnvsMetaFileBasename)).toString("utf8")
     );
 
-    const mergedEnv = ((): Record<string, string> => {
-        const acceptedEnvVarNames = new Set([...Object.keys(baseBuildTimeEnv), ...Object.keys(env)]);
-
-        return {
-            ...baseBuildTimeEnv,
-            ...env,
-            ...Object.fromEntries(
-                Object.entries(process.env)
-                    .filter(([key]) => acceptedEnvVarNames.has(key))
-                    .map(([key, value]) => (value === undefined ? undefined : ([key, value] as const)))
-                    .filter(exclude(undefined))
-            )
-        };
-    })();
+    const mergedEnv = {
+        ...baseBuildTimeEnv,
+        ...env,
+        ...Object.fromEntries(
+            Object.entries(process.env)
+                .filter(([key]) => key in env)
+                .map(([key, value]) => (value === undefined ? undefined : ([key, value] as const)))
+                .filter(exclude(undefined))
+        )
+    };
 
     const $pre_head = cheerio.load(
         renderHtmlAsEjs({
