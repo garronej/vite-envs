@@ -8,9 +8,6 @@
     <a href="https://github.com/garronej/vite-envs/actions">
       <img src="https://github.com/garronej/vite-envs/workflows/ci/badge.svg?branch=main">
     </a>
-    <a href="https://bundlephobia.com/package/vite-envs">
-      <img src="https://img.shields.io/bundlephobia/minzip/vite-envs">
-    </a>
     <a href="https://github.com/garronej/vite-envs/blob/main/LICENSE">
       <img src="https://img.shields.io/npm/l/vite-envs">
     </a>
