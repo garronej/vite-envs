@@ -46,6 +46,11 @@ fs.writeFileSync(
     )
 );
 
+fs.writeFileSync(
+    pathJoin(pathJoin(__dirname, "client.d.ts")),
+    Buffer.from(["// Replaced at runtime", "", "export type ImportMetaEnv ={};"].join("\n"), "utf8")
+);
+
 const commonThirdPartyDeps = (() => {
     // For example [ "@emotion" ] it's more convenient than
     // having to list every sub emotion packages (@emotion/css @emotion/utils ...)

@@ -22,7 +22,8 @@
     "types": "dist/index.d.ts",
     "exports": {
         ".": "./dist/index.js",
-        "./*": "./dist/*.js"
+        "./*": "./dist/*.js",
+        "./client": "./client.d.ts"
     },
     "lint-staged": {
         "*.{ts,tsx,json,md}": [
