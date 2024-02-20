@@ -3,5 +3,5 @@ export type ViteEnvsMeta = {
     assetsUrlPath: string;
     htmlPre: string;
     env: Record<string, string>;
-    baseBuildTimeEnv: Record<string, string>;
+    baseBuildTimeEnv: Record<string, unknown>;
 };

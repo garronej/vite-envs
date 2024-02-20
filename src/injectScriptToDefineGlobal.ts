@@ -3,7 +3,7 @@ import { nameOfTheGlobal } from "./constants";
 
 export function injectScriptToDefineGlobal(params: {
     $: cheerio.CheerioAPI;
-    env: Record<string, string>;
+    env: Record<string, unknown>;
 }): void {
     const { $, env } = params;
 
