@@ -43,6 +43,13 @@ More importantly, it allows you to ship a customizable Docker image of your weba
 -   📦 `import.meta.env` is an object, not a placeholder. `Object.keys(import.meta.env)` works.
 -   🌐 `index.html`: Use your envs in your HTML file.  
 
+# Types  
+
+One notable benefit of using `cra-envs` is you're getting strict types definitions for `import.meta.env` 
+and it's hot reloading enabled.  
+
+[types-hot-reloading.webm](https://github.com/garronej/vite-envs/assets/6702424/78113d59-ac59-46b6-ada2-c325f475256c)
+
 # Documentation
 
 👉[**vite-envs-starter**](https://github.com/garronej/vite-envs-starter)👈
