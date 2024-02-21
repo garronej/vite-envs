@@ -1,7 +1,7 @@
 {
     "name": "vite-envs",
-    "version": "3.6.2",
-    "description": "Script for embedding server variable in CRA apps without having to rebuild.",
+    "version": "3.6.3",
+    "description": "Env var in Vite at container startup",
     "repository": {
         "type": "git",
         "url": "git://github.com/garronej/vite-envs.git"
