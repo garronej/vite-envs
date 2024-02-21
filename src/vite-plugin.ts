@@ -3,7 +3,8 @@ import {
     sep as pathSep,
     posix as posixPath,
     resolve as pathResolve,
-    basename as pathBasename
+    basename as pathBasename,
+    relative as pathRelative
 } from "path";
 import type { Plugin, ResolvedConfig } from "vite";
 import { assert } from "tsafe/assert";
@@ -18,30 +19,30 @@ import type { ViteEnvsMeta } from "./ViteEnvsMeta";
 import { replaceAll } from "./tools/String.prototype.replaceAll";
 import { transformCodebase } from "./tools/transformCodebase";
 import { exclude } from "tsafe/exclude";
+import { getAbsoluteAndInOsFormatPath } from "./tools/getAbsoluteAndInOsFormatPath";
 
 export function viteEnvs(params?: {
     computedEnv?:
         | Record<string, unknown>
         | ((params: {
               resolvedConfig: ResolvedConfig;
-              env: Record<string, string>;
-              envLocal: Record<string, string>;
+              declaredEnv: Record<string, string>;
+              localEnv: Record<string, string>;
           }) => Promise<Record<string, unknown>> | Record<string, unknown>);
+    envDeclarationFile?: string;
 }) {
-    const { computedEnv: computedEnvOrGetComputedEnv } = params ?? {};
+    const { computedEnv: computedEnv_params, envDeclarationFile } = params ?? {};
 
     const getComputedEnv =
-        typeof computedEnvOrGetComputedEnv === "function"
-            ? computedEnvOrGetComputedEnv
-            : () => computedEnvOrGetComputedEnv ?? {};
+        typeof computedEnv_params === "function" ? computedEnv_params : () => computedEnv_params ?? {};
 
     let resultOfConfigResolved:
         | {
               appRootDirPath: string;
               baseBuildTimeEnv: Record<string, unknown>;
-              env: Record<string, string>;
+              declaredEnv: Record<string, string>;
               computedEnv: Record<string, unknown>;
-              envLocal: Record<string, string>;
+              localEnv: Record<string, string>;
               buildInfos:
                   | {
                         distDirPath: string;
@@ -58,8 +59,32 @@ export function viteEnvs(params?: {
             const appRootDirPath = resolvedConfig.root;
             const baseBuildTimeEnv: Record<string, unknown> = resolvedConfig.env;
 
-            const [env, envLocal] = [".env", ".env.local"].map(
-                (fileBasename): Record<string, string> => {
+            const declaredEnv = (() => {
+                const declarationEnvFilePath = getAbsoluteAndInOsFormatPath({
+                    "cwd": appRootDirPath,
+                    "pathIsh": envDeclarationFile ?? ".env"
+                });
+
+                if (!fs.existsSync(declarationEnvFilePath)) {
+                    throw new Error(
+                        `There is no ${pathRelative(appRootDirPath, declarationEnvFilePath)}`
+                    );
+                }
+
+                const { parsed } = dotenv.config({
+                    "path": declarationEnvFilePath,
+                    "encoding": "utf8"
+                });
+
+                assert(parsed !== undefined);
+
+                return parsed;
+            })();
+
+            const localEnv = (() => {
+                let envLocal: Record<string, string> = {};
+
+                [".env", ".env.local"].forEach(fileBasename => {
                     const filePath = pathJoin(appRootDirPath, fileBasename);
 
                     if (!fs.existsSync(filePath)) {
@@ -73,18 +98,25 @@ export function viteEnvs(params?: {
 
                     assert(parsed !== undefined);
 
-                    return parsed;
-                }
-            );
+                    envLocal = {
+                        ...envLocal,
+                        ...parsed
+                    };
+                });
 
-            const computedEnv = await getComputedEnv({ resolvedConfig, env, envLocal });
+                return Object.fromEntries(
+                    Object.entries(envLocal).filter(([key]) => key in declaredEnv)
+                );
+            })();
+
+            const computedEnv = await getComputedEnv({ resolvedConfig, localEnv, declaredEnv });
 
             resultOfConfigResolved = {
                 appRootDirPath,
                 baseBuildTimeEnv,
-                env,
+                declaredEnv,
                 computedEnv,
-                envLocal,
+                localEnv,
                 "buildInfos": undefined
             };
 
@@ -189,7 +221,7 @@ export function viteEnvs(params?: {
                             ...Object.entries({
                                 ...baseBuildTimeEnv,
                                 ...computedEnv,
-                                ...env
+                                ...declaredEnv
                             }).map(([key, value]) => {
                                 const valueType = (() => {
                                     if (typeof value === "string") {
@@ -289,7 +321,8 @@ export function viteEnvs(params?: {
         "transform": (code, id) => {
             assert(resultOfConfigResolved !== undefined);
 
-            const { appRootDirPath, baseBuildTimeEnv, computedEnv, env } = resultOfConfigResolved;
+            const { appRootDirPath, baseBuildTimeEnv, computedEnv, declaredEnv } =
+                resultOfConfigResolved;
 
             let transformedCode: string | undefined = undefined;
 
@@ -326,7 +359,7 @@ export function viteEnvs(params?: {
 
                         const out = `import.meta.env.${p1}`;
 
-                        if (!(p1 in env) && !(p1 in baseBuildTimeEnv) && !(p1 in computedEnv)) {
+                        if (!(p1 in declaredEnv) && !(p1 in baseBuildTimeEnv) && !(p1 in computedEnv)) {
                             return out.replace(/^import/, `import${singularString}`);
                         }
 
@@ -341,7 +374,7 @@ export function viteEnvs(params?: {
 
                         const out = `import.meta.env["${p1}"]`;
 
-                        if (!(p1 in env) && !(p1 in baseBuildTimeEnv) && !(p1 in computedEnv)) {
+                        if (!(p1 in declaredEnv) && !(p1 in baseBuildTimeEnv) && !(p1 in computedEnv)) {
                             return out.replace(/^import/, `import${singularString}`);
                         }
 
@@ -371,7 +404,7 @@ export function viteEnvs(params?: {
             "handler": html => {
                 assert(resultOfConfigResolved !== undefined);
 
-                const { baseBuildTimeEnv, env, envLocal, buildInfos, computedEnv } =
+                const { baseBuildTimeEnv, declaredEnv, localEnv, buildInfos, computedEnv } =
                     resultOfConfigResolved;
 
                 if (buildInfos !== undefined) {
@@ -383,10 +416,10 @@ export function viteEnvs(params?: {
                         Object.entries({
                             ...baseBuildTimeEnv,
                             ...computedEnv
-                        }).map(([key, value]) => [key, key in env ? `${value}` : value])
+                        }).map(([key, value]) => [key, key in declaredEnv ? `${value}` : value])
                     ),
                     ...Object.fromEntries(
-                        Object.entries(env).filter(
+                        Object.entries(declaredEnv).filter(
                             ([key, value]) => !(key in computedEnv && value === "")
                         )
                     ),
@@ -406,9 +439,12 @@ export function viteEnvs(params?: {
                                     )
                                     .filter(exclude(undefined))
                                     .filter(([, value]) => value !== "")
-                                    .filter(([key, value]) => key in env && value !== env[key])
+                                    .filter(
+                                        ([key, value]) =>
+                                            key in declaredEnv && value !== declaredEnv[key]
+                                    )
                             ),
-                            ...Object.fromEntries(Object.entries(envLocal).filter(([key]) => key in env))
+                            localEnv
                         };
                     })()
                 };
@@ -434,7 +470,7 @@ export function viteEnvs(params?: {
         "closeBundle": async () => {
             assert(resultOfConfigResolved !== undefined);
 
-            const { baseBuildTimeEnv, env, computedEnv, buildInfos } = resultOfConfigResolved;
+            const { baseBuildTimeEnv, declaredEnv, computedEnv, buildInfos } = resultOfConfigResolved;
 
             if (buildInfos === undefined) {
                 return;
@@ -451,7 +487,7 @@ export function viteEnvs(params?: {
                         .toString("utf8")
                 ).version,
                 assetsUrlPath,
-                env,
+                declaredEnv,
                 computedEnv,
                 baseBuildTimeEnv,
                 htmlPre

@@ -8,23 +8,22 @@ import { join as pathJoin } from "path";
 import { exclude } from "tsafe/exclude";
 
 export function postBuildInjectionScript() {
-    const { assetsUrlPath, baseBuildTimeEnv, env, computedEnv, htmlPre }: ViteEnvsMeta = JSON.parse(
-        fs.readFileSync(pathJoin(process.cwd(), viteEnvsMetaFileBasename)).toString("utf8")
-    );
+    const { assetsUrlPath, baseBuildTimeEnv, declaredEnv, computedEnv, htmlPre }: ViteEnvsMeta =
+        JSON.parse(fs.readFileSync(pathJoin(process.cwd(), viteEnvsMetaFileBasename)).toString("utf8"));
 
     const mergedEnv = {
         ...Object.fromEntries(
             Object.entries({
                 ...baseBuildTimeEnv,
                 ...computedEnv
-            }).map(([key, value]) => [key, key in env ? `${value}` : value])
+            }).map(([key, value]) => [key, key in declaredEnv ? `${value}` : value])
         ),
         ...Object.fromEntries(
-            Object.entries(env).filter(([key, value]) => !(key in computedEnv && value === ""))
+            Object.entries(declaredEnv).filter(([key, value]) => !(key in computedEnv && value === ""))
         ),
         ...Object.fromEntries(
             Object.entries(process.env)
-                .filter(([key]) => key in env)
+                .filter(([key]) => key in declaredEnv)
                 .map(([key, value]) => (value === undefined ? undefined : ([key, value] as const)))
                 .filter(exclude(undefined))
         )
