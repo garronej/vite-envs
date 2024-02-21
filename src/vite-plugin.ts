@@ -361,19 +361,15 @@ export function viteEnvs(params?: {
                         )
                     ),
                     ...Object.fromEntries(
-                        Object.entries(envLocal)
-                            .filter(([key]) => key in env)
-                            .filter(([, value]) => value !== "")
-                    ),
-                    ...Object.fromEntries(
                         Object.entries(process.env)
-                            .filter(([key]) => key in env)
                             .map(([key, value]) =>
                                 value === undefined ? undefined : ([key, value] as const)
                             )
                             .filter(exclude(undefined))
                             .filter(([, value]) => value !== "")
-                    )
+                            .filter(([key, value]) => key in env && value !== env[key])
+                    ),
+                    ...Object.fromEntries(Object.entries(envLocal).filter(([key]) => key in env))
                 };
 
                 const renderedHtml = renderHtmlAsEjs({
