@@ -56,7 +56,7 @@ and it's hot reloading enabled.
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=wsY7VDUIZM0">
-    <img width="800" alt="image" src="https://github.com/garronej/vite-envs/assets/6702424/9f79b37a-9cdd-40ce-be48-9475406e815d">
+    <img width="1000" alt="image" src="https://github.com/garronej/vite-envs/assets/6702424/9f79b37a-9cdd-40ce-be48-9475406e815d">
   </a>
 </p>
 
