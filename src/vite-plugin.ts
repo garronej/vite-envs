@@ -360,17 +360,31 @@ export function viteEnvs(params?: {
                             ([key, value]) => !(key in computedEnv && value === "")
                         )
                     ),
-                    ...Object.fromEntries(
-                        Object.entries(process.env)
-                            .map(([key, value]) =>
-                                value === undefined ? undefined : ([key, value] as const)
-                            )
-                            .filter(exclude(undefined))
-                            .filter(([, value]) => value !== "")
-                            .filter(([key, value]) => key in env && value !== env[key])
-                    ),
-                    ...Object.fromEntries(Object.entries(envLocal).filter(([key]) => key in env))
+                    ...(() => {
+                        if (buildInfos !== undefined) {
+                            // If we are building (`npx vite build`) we avoid to include the
+                            // dev machine environment variables in the final build.
+                            // We also omit the .env.local variables.
+                            return {};
+                        }
+
+                        return {
+                            ...Object.fromEntries(
+                                Object.entries(process.env)
+                                    .map(([key, value]) =>
+                                        value === undefined ? undefined : ([key, value] as const)
+                                    )
+                                    .filter(exclude(undefined))
+                                    .filter(([, value]) => value !== "")
+                                    .filter(([key, value]) => key in env && value !== env[key])
+                            ),
+                            ...Object.fromEntries(Object.entries(envLocal).filter(([key]) => key in env))
+                        };
+                    })()
                 };
+
+                if (buildInfos === undefined) {
+                }
 
                 const renderedHtml = renderHtmlAsEjs({
                     html,
