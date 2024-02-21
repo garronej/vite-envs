@@ -29,9 +29,10 @@ export function viteEnvs(params?: {
               declaredEnv: Record<string, string>;
               localEnv: Record<string, string>;
           }) => Promise<Record<string, unknown>> | Record<string, unknown>);
-    envDeclarationFile?: string;
+    /** Default: .env */
+    declarationFile?: string;
 }) {
-    const { computedEnv: computedEnv_params, envDeclarationFile } = params ?? {};
+    const { computedEnv: computedEnv_params, declarationFile = ".env" } = params ?? {};
 
     const getComputedEnv =
         typeof computedEnv_params === "function" ? computedEnv_params : () => computedEnv_params ?? {};
@@ -62,7 +63,7 @@ export function viteEnvs(params?: {
             const declaredEnv = (() => {
                 const declarationEnvFilePath = getAbsoluteAndInOsFormatPath({
                     "cwd": appRootDirPath,
-                    "pathIsh": envDeclarationFile ?? ".env"
+                    "pathIsh": declarationFile
                 });
 
                 if (!fs.existsSync(declarationEnvFilePath)) {
