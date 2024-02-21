@@ -43,7 +43,7 @@ More importantly, it allows you to ship a customizable Docker image of your weba
 -   🛡️ Type-safe: Type definition for your `import.meta.env`. Hot reload enabled!
 -   🌐 `index.html`: Use your envs in your HTML file.  
 -   📦 `import.meta.env` is an object, not a placeholder. `Object.keys(import.meta.env)` works.
--   🧠 Supports computation of env default values at build time.  
+-   🧠 [Supports computation of env default values at build time](https://github.com/garronej/vite-envs-starter/blob/b0febf2d8ffa67dceaf140372445e3cb8059c2e1/vite.config.ts#L14-L37).  
 
 # Types  
 
