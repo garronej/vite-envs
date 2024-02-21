@@ -11,13 +11,13 @@ import { getThisCodebaseRootDirPath } from "./tools/getThisCodebaseRootDirPath";
 import * as fs from "fs";
 import * as dotenv from "dotenv";
 import * as cheerio from "cheerio";
-import { exclude } from "tsafe/exclude";
 import { nameOfTheGlobal, viteEnvsMetaFileBasename, updateTypingScriptEnvName } from "./constants";
 import { injectScriptToDefineGlobal } from "./injectScriptToDefineGlobal";
 import { renderHtmlAsEjs } from "./renderHtmlAsEjs";
 import type { ViteEnvsMeta } from "./ViteEnvsMeta";
 import { replaceAll } from "./tools/String.prototype.replaceAll";
 import { transformCodebase } from "./tools/transformCodebase";
+import { exclude } from "tsafe/exclude";
 
 export function viteEnvs(params?: {
     computedEnv?:
@@ -361,11 +361,16 @@ export function viteEnvs(params?: {
                     ...Object.fromEntries(
                         Object.entries(envLocal)
                             .filter(([key]) => key in env)
-                            .filter(([key, value]) => !(key in computedEnv && value === ""))
+                            .filter(([, value]) => value !== "")
+                    ),
+                    ...Object.fromEntries(
+                        Object.entries(process.env)
+                            .filter(([key]) => key in env)
                             .map(([key, value]) =>
                                 value === undefined ? undefined : ([key, value] as const)
                             )
                             .filter(exclude(undefined))
+                            .filter(([, value]) => value !== "")
                     )
                 };
 
