@@ -445,13 +445,10 @@ export function viteEnvs(params?: {
                                             key in declaredEnv && value !== declaredEnv[key]
                                     )
                             ),
-                            localEnv
+                            ...localEnv
                         };
                     })()
                 };
-
-                if (buildInfos === undefined) {
-                }
 
                 const renderedHtml = renderHtmlAsEjs({
                     html,
@@ -497,8 +494,6 @@ export function viteEnvs(params?: {
             if (!fs.existsSync(distDirPath)) {
                 fs.mkdirSync(distDirPath, { "recursive": true });
             }
-
-            console.log(pathJoin(distDirPath, viteEnvsMetaFileBasename));
 
             fs.writeFileSync(
                 pathJoin(distDirPath, viteEnvsMetaFileBasename),
