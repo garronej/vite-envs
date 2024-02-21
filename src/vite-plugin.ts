@@ -379,8 +379,12 @@ export function viteEnvs(params?: {
                 }
 
                 const mergedEnv = {
-                    ...baseBuildTimeEnv,
-                    ...computedEnv,
+                    ...Object.fromEntries(
+                        Object.entries({
+                            ...baseBuildTimeEnv,
+                            ...computedEnv
+                        }).map(([key, value]) => [key, key in env ? `${value}` : value])
+                    ),
                     ...Object.fromEntries(
                         Object.entries(env).filter(
                             ([key, value]) => !(key in computedEnv && value === "")
