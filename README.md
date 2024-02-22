@@ -44,7 +44,7 @@ More importantly, it allows you to ship a customizable Docker image of your weba
 -   📦 `import.meta.env` is an object, not a placeholder. `const { FOO } = import.meta.env;` works.
 -   🧠 [Supports computation of env values at build time](https://github.com/garronej/vite-envs-starter/blob/b0febf2d8ffa67dceaf140372445e3cb8059c2e1/vite.config.ts#L14-L37).  
 -   🔒 Secure: Only injects environment variables explicitly defined in the `.env` file.  
-    You can also choose to declare your variables in another file like `.env.declaration` if your `.env` is gitignored.  
+    [You can also choose to declare your variables in another file like `.env.declaration` if `.env` is gitignored in your project.](https://github.com/garronej/vite-envs-starter/blob/73095e87c31adde50eb34e9fcefd0bd7b8f549ea/vite.config.ts#L15-L19)   
 
 # Types  
 
