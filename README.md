@@ -49,7 +49,7 @@ More importantly, it allows you to ship a customizable Docker image of your weba
 # Types  
 
 One notable benefit of using `cra-envs` is you're getting strict types definitions for `import.meta.env`.  
-Definitions are even hot reloaded in dev mode!  
+Definitions are even hot reloaded!  
 
 [types-hot-reloading.webm](https://github.com/garronej/vite-envs/assets/6702424/78113d59-ac59-46b6-ada2-c325f475256c)
 
