@@ -56,8 +56,9 @@
         "dotenv": "^16.4.4",
         "ejs": "^3.1.9",
         "json5": "^2.2.3",
-        "tsafe": "^1.6.6",
-        "yaml": "^2.3.4"
+        "yaml": "^2.3.4",
+        "magic-string": "^0.30.7",
+        "tsafe": "^1.6.6"
     },
     "devDependencies": {
         "@types/ejs": "^3.1.4",

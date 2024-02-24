@@ -16,10 +16,10 @@ import { nameOfTheGlobal, viteEnvsMetaFileBasename, updateTypingScriptEnvName } 
 import { injectScriptToDefineGlobal } from "./injectScriptToDefineGlobal";
 import { renderHtmlAsEjs } from "./renderHtmlAsEjs";
 import type { ViteEnvsMeta } from "./ViteEnvsMeta";
-import { replaceAll } from "./tools/String.prototype.replaceAll";
 import { transformCodebase } from "./tools/transformCodebase";
 import { exclude } from "tsafe/exclude";
 import { getAbsoluteAndInOsFormatPath } from "./tools/getAbsoluteAndInOsFormatPath";
+import MagicString from "magic-string";
 
 export function viteEnvs(params?: {
     computedEnv?:
@@ -44,6 +44,7 @@ export function viteEnvs(params?: {
               declaredEnv: Record<string, string>;
               computedEnv: Record<string, unknown>;
               localEnv: Record<string, string>;
+              shouldGenerateSourcemap: boolean;
               buildInfos:
                   | {
                         distDirPath: string;
@@ -118,6 +119,7 @@ export function viteEnvs(params?: {
                 declaredEnv,
                 computedEnv,
                 localEnv,
+                "shouldGenerateSourcemap": resolvedConfig.build.sourcemap !== false,
                 "buildInfos": undefined
             };
 
@@ -322,83 +324,88 @@ export function viteEnvs(params?: {
         "transform": (code, id) => {
             assert(resultOfConfigResolved !== undefined);
 
-            const { appRootDirPath, baseBuildTimeEnv, computedEnv, declaredEnv } =
-                resultOfConfigResolved;
+            const {
+                appRootDirPath,
+                baseBuildTimeEnv,
+                computedEnv,
+                declaredEnv,
+                shouldGenerateSourcemap
+            } = resultOfConfigResolved;
 
-            let transformedCode: string | undefined = undefined;
+            {
+                const isWithinSourceDirectory = id.startsWith(pathJoin(appRootDirPath, "src") + pathSep);
 
-            replace_import_meta_env_base_url_in_source_code: {
-                {
-                    const isWithinSourceDirectory = id.startsWith(
-                        pathJoin(appRootDirPath, "src") + pathSep
-                    );
-
-                    if (!isWithinSourceDirectory) {
-                        break replace_import_meta_env_base_url_in_source_code;
-                    }
+                if (!isWithinSourceDirectory) {
+                    return;
                 }
-
-                {
-                    const isJavascriptFile = id.endsWith(".js") || id.endsWith(".jsx");
-                    const isTypeScriptFile = id.endsWith(".ts") || id.endsWith(".tsx");
-
-                    if (!isTypeScriptFile && !isJavascriptFile) {
-                        break replace_import_meta_env_base_url_in_source_code;
-                    }
-                }
-
-                if (transformedCode === undefined) {
-                    transformedCode = code;
-                }
-
-                const singularString = "-xs3dSdKdSwPrRw3zAaxBbcPtMmQqLlNnJjKkHhGgFfEeDdCcBbAa";
-
-                transformedCode = transformedCode.replace(
-                    new RegExp(`import\\.meta\\.env\\.([A-Za-z0-9$_]+)`, "g"),
-                    (...[, p1]) => {
-                        assert(typeof p1 === "string");
-
-                        const out = `import.meta.env.${p1}`;
-
-                        if (!(p1 in declaredEnv) && !(p1 in baseBuildTimeEnv) && !(p1 in computedEnv)) {
-                            return out.replace(/^import/, `import${singularString}`);
-                        }
-
-                        return out;
-                    }
-                );
-
-                transformedCode = transformedCode.replace(
-                    new RegExp(`import\\.meta\\.env\\["([^"]+)"\\]`, "g"),
-                    (...[, p1]) => {
-                        assert(typeof p1 === "string");
-
-                        const out = `import.meta.env["${p1}"]`;
-
-                        if (!(p1 in declaredEnv) && !(p1 in baseBuildTimeEnv) && !(p1 in computedEnv)) {
-                            return out.replace(/^import/, `import${singularString}`);
-                        }
-
-                        return out;
-                    }
-                );
-
-                transformedCode = replaceAll(
-                    transformedCode,
-                    "import.meta.env",
-                    `window.${nameOfTheGlobal}`
-                );
-
-                transformedCode = replaceAll(transformedCode, singularString, "");
             }
 
-            if (transformedCode === undefined) {
+            {
+                const isJavascriptFile = id.endsWith(".js") || id.endsWith(".jsx");
+                const isTypeScriptFile = id.endsWith(".ts") || id.endsWith(".tsx");
+
+                if (!isTypeScriptFile && !isJavascriptFile) {
+                    return;
+                }
+            }
+
+            if (!code.includes("import.meta.env")) {
                 return;
             }
 
-            return {
-                "code": transformedCode
-            };
+            const transformedCode = new MagicString(code);
+
+            transformedCode.replace(
+                /import\.meta\.env(?:\.([A-Za-z0-9$_]+)|\["([^"]+)"\]|(.?))/g,
+                (match, p1, p2, p3) => {
+                    const out = (() => {
+                        const globalRef = `window.${nameOfTheGlobal}`;
+
+                        if (p3 !== undefined) {
+                            return `${globalRef}${p3}`;
+                        }
+
+                        const varName = p1 || p2;
+
+                        assert(typeof varName === "string");
+
+                        const isUnknownVar =
+                            !(varName in declaredEnv) &&
+                            !(varName in baseBuildTimeEnv) &&
+                            !(varName in computedEnv);
+
+                        if (isUnknownVar) {
+                            // NOTE: We don't modify the code if the variable is unknown.
+                            return match;
+                        }
+
+                        return `${globalRef}${p1 !== undefined ? `.${p1}` : `["${p2}"]`}`;
+                    })();
+
+                    return out;
+                }
+            );
+
+            if (!transformedCode.hasChanged()) {
+                return;
+            }
+
+            if (!shouldGenerateSourcemap) {
+                return transformedCode.toString();
+            }
+
+            const map = transformedCode.generateMap({
+                "source": id,
+                "includeContent": true,
+                "hires": true
+            });
+
+            return map === undefined
+                ? transformedCode.toString()
+                : {
+                      "code": transformedCode.toString(),
+                      "map": map.toString()
+                  };
         },
         "transformIndexHtml": {
             "order": "pre",
