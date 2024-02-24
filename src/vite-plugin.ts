@@ -400,12 +400,10 @@ export function viteEnvs(params?: {
                 "hires": true
             });
 
-            return map === undefined
-                ? transformedCode.toString()
-                : {
-                      "code": transformedCode.toString(),
-                      "map": map.toString()
-                  };
+            return {
+                "code": transformedCode.toString(),
+                "map": map.toString()
+            };
         },
         "transformIndexHtml": {
             "order": "pre",
