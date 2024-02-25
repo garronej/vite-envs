@@ -1,7 +1,9 @@
 import type { ViteEnvsMeta } from "../ViteEnvsMeta";
 import { viteEnvsMetaFileBasename } from "../constants";
-import { injectScriptToDefineGlobal } from "../injectScriptToDefineGlobal";
+import { injectInHeadBeforeFirstScriptTag } from "../injectInHeadBeforeFirstScriptTag";
+import { getScriptThatDefinesTheGlobal } from "../getScriptThatDefinesTheGlobal";
 import { renderHtmlAsEjs } from "../renderHtmlAsEjs";
+import { substituteHtmPlaceholders } from "../substituteHtmPlaceholders";
 import * as cheerio from "cheerio";
 import * as fs from "fs";
 import { join as pathJoin } from "path";
@@ -29,12 +31,19 @@ export function postBuildInjectionScript() {
         )
     };
 
-    const $pre_head = cheerio.load(
-        renderHtmlAsEjs({
-            "html": htmlPre,
-            "env": mergedEnv
-        })
-    )("head");
+    let processedHtml = htmlPre;
+
+    processedHtml = renderHtmlAsEjs({
+        "html": processedHtml,
+        "env": mergedEnv
+    });
+
+    processedHtml = substituteHtmPlaceholders({
+        "html": processedHtml,
+        "env": mergedEnv
+    });
+
+    const $pre_head = cheerio.load(processedHtml)("head");
 
     const indexHtmlFilePath = pathJoin(process.cwd(), "index.html");
 
@@ -45,10 +54,12 @@ export function postBuildInjectionScript() {
 
     $post("head").replaceWith($pre_head);
 
-    injectScriptToDefineGlobal({
-        "$": $post,
-        "env": mergedEnv
+    processedHtml = $post.html();
+
+    processedHtml = injectInHeadBeforeFirstScriptTag({
+        "html": processedHtml,
+        "htmlToInject": getScriptThatDefinesTheGlobal({ "env": mergedEnv })
     });
 
-    fs.writeFileSync(indexHtmlFilePath, Buffer.from($post.html(), "utf8"));
+    fs.writeFileSync(indexHtmlFilePath, Buffer.from(processedHtml, "utf8"));
 }

@@ -13,13 +13,16 @@ import * as fs from "fs";
 import * as dotenv from "dotenv";
 import * as cheerio from "cheerio";
 import { nameOfTheGlobal, viteEnvsMetaFileBasename, updateTypingScriptEnvName } from "./constants";
-import { injectScriptToDefineGlobal } from "./injectScriptToDefineGlobal";
+import { getScriptThatDefinesTheGlobal } from "./getScriptThatDefinesTheGlobal";
+import { injectInHeadBeforeFirstScriptTag } from "./injectInHeadBeforeFirstScriptTag";
 import { renderHtmlAsEjs } from "./renderHtmlAsEjs";
+import { substituteHtmPlaceholders } from "./substituteHtmPlaceholders";
 import type { ViteEnvsMeta } from "./ViteEnvsMeta";
 import { transformCodebase } from "./tools/transformCodebase";
 import { exclude } from "tsafe/exclude";
 import { getAbsoluteAndInOsFormatPath } from "./tools/getAbsoluteAndInOsFormatPath";
 import MagicString from "magic-string";
+import { replaceAllShDeclaration } from "./tools/replaceAll.sh";
 
 export function viteEnvs(params?: {
     computedEnv?:
@@ -31,8 +34,14 @@ export function viteEnvs(params?: {
           }) => Promise<Record<string, unknown>> | Record<string, unknown>);
     /** Default: .env */
     declarationFile?: string;
+    /** Default: false */
+    doRenderAsEjs?: boolean;
 }) {
-    const { computedEnv: computedEnv_params, declarationFile = ".env" } = params ?? {};
+    const {
+        computedEnv: computedEnv_params,
+        declarationFile = ".env",
+        doRenderAsEjs = false
+    } = params ?? {};
 
     const getComputedEnv =
         typeof computedEnv_params === "function" ? computedEnv_params : () => computedEnv_params ?? {};
@@ -54,6 +63,8 @@ export function viteEnvs(params?: {
           }
         | undefined = undefined;
     let htmlPre: string | undefined = undefined;
+
+    const tmpRefString = "VITE_ENVS_TMP_REF_XS3SLW";
 
     const plugin = {
         "name": "vite-envs",
@@ -407,15 +418,187 @@ export function viteEnvs(params?: {
         },
         "transformIndexHtml": {
             "order": "pre",
-            "handler": html => {
+            "transform": (() => {
+                const getMergedEnv = () => {
+                    assert(resultOfConfigResolved !== undefined);
+
+                    const { baseBuildTimeEnv, declaredEnv, localEnv, computedEnv } =
+                        resultOfConfigResolved;
+
+                    const mergedEnv = {
+                        ...Object.fromEntries(
+                            Object.entries({
+                                ...baseBuildTimeEnv,
+                                ...computedEnv
+                            }).map(([key, value]) => [key, key in declaredEnv ? `${value}` : value])
+                        ),
+                        ...Object.fromEntries(
+                            Object.entries(declaredEnv).filter(
+                                ([key, value]) => !(key in computedEnv && value === "")
+                            )
+                        ),
+                        ...Object.fromEntries(
+                            Object.entries(process.env)
+                                .map(([key, value]) =>
+                                    value === undefined ? undefined : ([key, value] as const)
+                                )
+                                .filter(exclude(undefined))
+                                .filter(([, value]) => value !== "")
+                                .filter(
+                                    ([key, value]) => key in declaredEnv && value !== declaredEnv[key]
+                                )
+                        ),
+                        ...localEnv
+                    };
+
+                    return { mergedEnv };
+                };
+
+                const transform_ejs = (html: string) => {
+                    assert(resultOfConfigResolved !== undefined);
+
+                    const { buildInfos } = resultOfConfigResolved;
+
+                    if (buildInfos !== undefined) {
+                        htmlPre = html;
+                    }
+
+                    const { mergedEnv } = getMergedEnv();
+
+                    let processedHtml = renderHtmlAsEjs({
+                        html,
+                        "env": mergedEnv
+                    });
+
+                    processedHtml = substituteHtmPlaceholders({
+                        "html": processedHtml,
+                        "env": mergedEnv
+                    });
+
+                    processedHtml = injectInHeadBeforeFirstScriptTag({
+                        "html": processedHtml,
+                        "htmlToInject": getScriptThatDefinesTheGlobal({ "env": mergedEnv })
+                    });
+
+                    return processedHtml;
+                };
+
+                const transform_noEjs = (html: string) => {
+                    assert(resultOfConfigResolved !== undefined);
+
+                    const { buildInfos } = resultOfConfigResolved;
+
+                    const { mergedEnv } = getMergedEnv();
+
+                    const action_buildMode = () => {
+                        const htmlPostSubstitution = substituteHtmPlaceholders({
+                            html,
+                            "env": Object.fromEntries(
+                                Object.keys(mergedEnv).map(key => [key, `${tmpRefString}(${key})`])
+                            )
+                        });
+
+                        return htmlPostSubstitution;
+                    };
+
+                    const action_devMode = () => {
+                        let processedHtml = substituteHtmPlaceholders({
+                            html,
+                            "env": mergedEnv
+                        });
+
+                        processedHtml = injectInHeadBeforeFirstScriptTag({
+                            "html": processedHtml,
+                            "htmlToInject": getScriptThatDefinesTheGlobal({ "env": mergedEnv })
+                        });
+
+                        return processedHtml;
+                    };
+
+                    return buildInfos === undefined ? action_devMode() : action_buildMode();
+                };
+
+                return doRenderAsEjs ? transform_ejs : transform_noEjs;
+            })()
+        },
+        "closeBundle": (() => {
+            const closeBundle_ejs = () => {
                 assert(resultOfConfigResolved !== undefined);
 
-                const { baseBuildTimeEnv, declaredEnv, localEnv, buildInfos, computedEnv } =
+                const { baseBuildTimeEnv, declaredEnv, computedEnv, buildInfos } =
                     resultOfConfigResolved;
 
-                if (buildInfos !== undefined) {
-                    htmlPre = html;
+                if (buildInfos === undefined) {
+                    return;
                 }
+
+                assert(htmlPre !== undefined);
+
+                const { assetsUrlPath, distDirPath } = buildInfos;
+
+                const viteEnvsMeta: ViteEnvsMeta = {
+                    "version": JSON.parse(
+                        fs
+                            .readFileSync(pathJoin(getThisCodebaseRootDirPath(), "package.json"))
+                            .toString("utf8")
+                    ).version,
+                    assetsUrlPath,
+                    declaredEnv,
+                    computedEnv,
+                    baseBuildTimeEnv,
+                    htmlPre
+                };
+
+                fs.writeFileSync(
+                    pathJoin(distDirPath, viteEnvsMetaFileBasename),
+                    Buffer.from(JSON.stringify(viteEnvsMeta, null, 4), "utf8")
+                );
+            };
+            const closeBundle_noEjs = () => {
+                assert(resultOfConfigResolved !== undefined);
+
+                const { buildInfos, baseBuildTimeEnv, computedEnv, declaredEnv } =
+                    resultOfConfigResolved;
+
+                if (buildInfos === undefined) {
+                    return;
+                }
+
+                const { distDirPath } = buildInfos;
+
+                const indexHtmlFilePath = pathJoin(distDirPath, "index.html");
+
+                let processedHtml = fs.readFileSync(indexHtmlFilePath).toString("utf8");
+
+                processedHtml = processedHtml.replace(
+                    new RegExp(`${tmpRefString}\\(([^)]+)\\)`, "g"),
+                    (_, key) => `%${key}%`
+                );
+
+                const placeholderForViteEnvsScript = `<!-- vite-envs script placeholder xKsPmLs30swKsdIsVx -->`;
+
+                processedHtml = (function injectScriptPlaceholder() {
+                    const $ = cheerio.load(processedHtml);
+
+                    const firstScriptTag = $("head script").first();
+
+                    if (firstScriptTag.length !== 0) {
+                        // If a script tag exists, prepend the new script before the first script tag
+                        firstScriptTag.before(placeholderForViteEnvsScript);
+                    } else {
+                        // If no script tag exists, append the new script to the head
+                        $("head").append(placeholderForViteEnvsScript);
+                    }
+
+                    return $.html();
+                })();
+
+                processedHtml = injectInHeadBeforeFirstScriptTag({
+                    "html": processedHtml,
+                    "htmlToInject": placeholderForViteEnvsScript
+                });
+
+                fs.writeFileSync(indexHtmlFilePath, Buffer.from(processedHtml, "utf8"));
 
                 const mergedEnv = {
                     ...Object.fromEntries(
@@ -428,69 +611,79 @@ export function viteEnvs(params?: {
                         Object.entries(declaredEnv).filter(
                             ([key, value]) => !(key in computedEnv && value === "")
                         )
-                    ),
-                    ...Object.fromEntries(
-                        Object.entries(process.env)
-                            .map(([key, value]) =>
-                                value === undefined ? undefined : ([key, value] as const)
-                            )
-                            .filter(exclude(undefined))
-                            .filter(([, value]) => value !== "")
-                            .filter(([key, value]) => key in declaredEnv && value !== declaredEnv[key])
-                    ),
-                    ...localEnv
+                    )
                 };
 
-                const renderedHtml = renderHtmlAsEjs({
-                    html,
-                    "env": mergedEnv
-                });
+                const scriptPath = pathJoin(distDirPath, "vite-envs.sh");
 
-                const $ = cheerio.load(renderedHtml);
+                const singularString = "xPsZs9swrPvxYpC";
 
-                injectScriptToDefineGlobal({
-                    $,
-                    "env": mergedEnv
-                });
+                const scriptContent = [
+                    `#!/bin/sh`,
+                    ``,
+                    replaceAllShDeclaration,
+                    ``,
+                    `html=$(echo "${Buffer.from(processedHtml, "utf8").toString(
+                        "base64"
+                    )}" | base64 -d)`,
+                    ``,
+                    ...Object.entries(mergedEnv)
+                        .map(([name, value]) => [
+                            `${name}=\${${name}:-\$(echo "${Buffer.from(`${value}`, "utf8").toString(
+                                "base64"
+                            )}" | base64 -d)}`,
+                            `${name}_base64=\$(echo "\$${name}" | base64)`
+                        ])
+                        .flat(),
+                    ``,
+                    `processedHtml="$html"`,
+                    ``,
+                    ...Object.keys(mergedEnv).map(
+                        name =>
+                            `processedHtml=$(replaceAll "$processedHtml" "%${name}%" "${name}${singularString}")`
+                    ),
+                    ``,
+                    ...Object.keys(mergedEnv).map(
+                        name =>
+                            `processedHtml=$(replaceAll "$processedHtml" "${name}${singularString}" "\$${name}")`
+                    ),
+                    ``,
+                    `json=""`,
+                    `json="$json{"`,
+                    ...Object.keys(mergedEnv).map(
+                        (name, i, names) =>
+                            `"$json\\"${name}\\":\\"\$${name}_base64\\"${
+                                i === names.length - 1 ? "" : ","
+                            }"`
+                    ),
+                    `json="$json}"`,
+                    ``,
+                    `script="\n"`,
+                    `script="$script    <script data-script-description=\"Environment variables injected by vite-envs\">\n"`,
+                    `script="$script      var envWithValuesInBase64 = $json;\n"`,
+                    `script="$script      var env = {};\n"`,
+                    `script="$script      Object.keys(envWithValuesInBase64).forEach(function (key) {\n"`,
+                    `script="$script        env[key] = atob(envWithValuesInBase64[key]);\n"`,
+                    `script="$script      });\n"`,
+                    `script="$script      window.__VITE_ENVS = env;\n"`,
+                    `script="$script    </script>"`,
+                    ``,
+                    `scriptPlaceholder="${placeholderForViteEnvsScript}"`,
+                    ``,
+                    `processedHtml=$(replaceAll "$processedHtml" "$scriptPlaceholder" "$script")`,
+                    ``,
+                    `DIR=$(cd "$(dirname "$0")" && pwd)`,
+                    ``,
+                    `echo "$processedHtml" > "$DIR/index.html"`,
+                    ``
+                ].join("\n");
 
-                return $.html();
-            }
-        },
-        "closeBundle": async () => {
-            assert(resultOfConfigResolved !== undefined);
-
-            const { baseBuildTimeEnv, declaredEnv, computedEnv, buildInfos } = resultOfConfigResolved;
-
-            if (buildInfos === undefined) {
-                return;
-            }
-
-            assert(htmlPre !== undefined);
-
-            const { assetsUrlPath, distDirPath } = buildInfos;
-
-            const viteEnvsMeta: ViteEnvsMeta = {
-                "version": JSON.parse(
-                    fs
-                        .readFileSync(pathJoin(getThisCodebaseRootDirPath(), "package.json"))
-                        .toString("utf8")
-                ).version,
-                assetsUrlPath,
-                declaredEnv,
-                computedEnv,
-                baseBuildTimeEnv,
-                htmlPre
+                fs.writeFileSync(scriptPath, Buffer.from(scriptContent, "utf8"));
+                fs.chmodSync(scriptPath, "755");
             };
 
-            if (!fs.existsSync(distDirPath)) {
-                fs.mkdirSync(distDirPath, { "recursive": true });
-            }
-
-            fs.writeFileSync(
-                pathJoin(distDirPath, viteEnvsMetaFileBasename),
-                Buffer.from(JSON.stringify(viteEnvsMeta, null, 4), "utf8")
-            );
-        }
+            return doRenderAsEjs ? closeBundle_ejs : closeBundle_noEjs;
+        })()
     } satisfies Plugin;
 
     return plugin as any;
