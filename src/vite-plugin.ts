@@ -652,7 +652,7 @@ export function viteEnvs(params?: {
                     `script="\n"`,
                     `script="$script    <script data-script-description=\\"Environment variables injected by vite-envs\\">\n"`,
                     `script="$script      var envWithValuesInBase64 = $json;\n"`,
-                    `script="$script      var env = {};\\n"`,
+                    `script="$script      var env = {};\n"`,
                     `script="$script      Object.keys(envWithValuesInBase64).forEach(function (key) {\n"`,
                     `script="$script        env[key] = atob(envWithValuesInBase64[key]);\n"`,
                     `script="$script      });\n"`,
