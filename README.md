@@ -43,8 +43,22 @@ More importantly, it allows you to ship a customizable Docker image of your weba
 -   🌐 `index.html`: Use your envs in your HTML file. Example `<title>%FOO%</title>`
 -   📦 `import.meta.env` is an object, not a placeholder. `const { FOO } = import.meta.env;` works.
 -   🧠 [Supports computation of env values at build time](https://github.com/garronej/vite-envs-starter/blob/b0febf2d8ffa67dceaf140372445e3cb8059c2e1/vite.config.ts#L14-L37).  
+-   ⚙️ (Optional) enables to use EJS expressions in your `index.html`. `<title><%= import.meta.env.FOO.toUpperCase() =></title>`
 -   🔒 Secure: Only injects environment variables explicitly defined in the `.env` file.  
     [You can also choose to declare your variables in another file like `.env.declaration` if `.env` is gitignored in your project.](https://github.com/garronej/vite-envs/assets/6702424/bc64605c-6aaf-427d-b8ce-b829dc63fc35)   
+
+# How it works  
+
+`vite-envs` generates a `dist/vite-envs.sh` script.  When executed, this script updates `dist/index.html` by 
+injecting the environment variables defined on the host where the script is run.  
+
+Making it work is as easy as updating your `Dockerfile` as follows:
+
+`Dockerfile`  
+```diff
+-CMD ["nginx", "-g", "daemon off;"]
++ENTRYPOINT sh -c "./vite-envs.sh && nginx -g 'daemon off;'"
+```  
 
 # Types  
 
