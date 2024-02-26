@@ -35,12 +35,12 @@ export function viteEnvs(params?: {
     /** Default: .env */
     declarationFile?: string;
     /** Default: false */
-    doRenderHtmlAsEjs?: boolean;
+    renderHtmlAsEjs?: boolean;
 }) {
     const {
         computedEnv: computedEnv_params,
         declarationFile = ".env",
-        doRenderHtmlAsEjs = false
+        renderHtmlAsEjs: doRenderHtmlAsEjs = false
     } = params ?? {};
 
     const getComputedEnv =
