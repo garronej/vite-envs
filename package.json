@@ -1,6 +1,6 @@
 {
     "name": "vite-envs",
-    "version": "4.0.5",
+    "version": "4.0.6",
     "description": "Env var in Vite at container startup",
     "repository": {
         "type": "git",
