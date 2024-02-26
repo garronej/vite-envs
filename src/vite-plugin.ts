@@ -11,7 +11,6 @@ import { assert } from "tsafe/assert";
 import { getThisCodebaseRootDirPath } from "./tools/getThisCodebaseRootDirPath";
 import * as fs from "fs";
 import * as dotenv from "dotenv";
-import * as cheerio from "cheerio";
 import { nameOfTheGlobal, viteEnvsMetaFileBasename, updateTypingScriptEnvName } from "./constants";
 import { getScriptThatDefinesTheGlobal } from "./getScriptThatDefinesTheGlobal";
 import { injectInHeadBeforeFirstScriptTag } from "./injectInHeadBeforeFirstScriptTag";
@@ -581,22 +580,6 @@ export function viteEnvs(params?: {
 
                 const placeholderForViteEnvsScript = `<!-- vite-envs script placeholder xKsPmLs30swKsdIsVx -->`;
 
-                processedHtml = (function injectScriptPlaceholder() {
-                    const $ = cheerio.load(processedHtml);
-
-                    const firstScriptTag = $("head script").first();
-
-                    if (firstScriptTag.length !== 0) {
-                        // If a script tag exists, prepend the new script before the first script tag
-                        firstScriptTag.before(placeholderForViteEnvsScript);
-                    } else {
-                        // If no script tag exists, append the new script to the head
-                        $("head").append(placeholderForViteEnvsScript);
-                    }
-
-                    return $.html();
-                })();
-
                 processedHtml = injectInHeadBeforeFirstScriptTag({
                     "html": processedHtml,
                     "htmlToInject": placeholderForViteEnvsScript
@@ -632,12 +615,16 @@ export function viteEnvs(params?: {
                     )}" | base64 -d)`,
                     ``,
                     ...Object.entries(mergedEnv)
-                        .map(([name, value]) => [
-                            `${name}=\${${name}:-\$(echo "${Buffer.from(`${value}`, "utf8").toString(
-                                "base64"
-                            )}" | base64 -d)}`,
-                            `${name}_base64=\$(echo "\$${name}" | base64)`
-                        ])
+                        .map(([name, value]) => {
+                            const valueB64 = Buffer.from(`${value}`, "utf8").toString("base64");
+
+                            return [
+                                name in declaredEnv
+                                    ? `${name}=\${${name}:-$(echo "${valueB64}" | base64 -d)}`
+                                    : `${name}=$(echo "${valueB64}" | base64 -d)`,
+                                `${name}_base64=\$(echo "\$${name}" | base64)`
+                            ];
+                        })
                         .flat(),
                     ``,
                     `processedHtml="$html"`,
@@ -656,21 +643,21 @@ export function viteEnvs(params?: {
                     `json="$json{"`,
                     ...Object.keys(mergedEnv).map(
                         (name, i, names) =>
-                            `"$json\\"${name}\\":\\"\$${name}_base64\\"${
+                            `json="$json\\"${name}\\":\\"\$${name}_base64\\"${
                                 i === names.length - 1 ? "" : ","
                             }"`
                     ),
                     `json="$json}"`,
                     ``,
-                    `script="\n"`,
-                    `script="$script    <script data-script-description=\"Environment variables injected by vite-envs\">\n"`,
-                    `script="$script      var envWithValuesInBase64 = $json;\n"`,
-                    `script="$script      var env = {};\n"`,
-                    `script="$script      Object.keys(envWithValuesInBase64).forEach(function (key) {\n"`,
-                    `script="$script        env[key] = atob(envWithValuesInBase64[key]);\n"`,
-                    `script="$script      });\n"`,
-                    `script="$script      window.${nameOfTheGlobal} = env;\n"`,
-                    `script="$script    </script>"`,
+                    `script="\\n"`,
+                    `script="$script    <script data-script-description=\\"Environment variables injected by vite-envs\\">\\n"`,
+                    `script="$script      var envWithValuesInBase64 = $json;\\n"`,
+                    `script="$script      var env = {};\\n"`,
+                    `script="$script      Object.keys(envWithValuesInBase64).forEach(function (key) {\\n"`,
+                    `script="$script        env[key] = atob(envWithValuesInBase64[key]);\\n"`,
+                    `script="$script      });\\n"`,
+                    `script="$script      window.${nameOfTheGlobal} = env;\\n"`,
+                    `script="$script    </script>\\n"`,
                     ``,
                     `scriptPlaceholder="${placeholderForViteEnvsScript}"`,
                     ``,
