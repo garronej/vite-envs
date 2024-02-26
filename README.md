@@ -49,8 +49,10 @@ More importantly, it allows you to ship a customizable Docker image of your weba
 
 # How it works  
 
-`vite-envs` generates a `dist/vite-envs.sh` script.  When executed, this script updates `dist/index.html` by 
-injecting the environment variables defined on the host where the script is run.  
+`vite-envs` is a Vite plugin.  
+When you build your app (`vite build`) it generate a `dist/vite-envs.sh` script.  
+When executed, this script updates the `dist/index.html` by injecting the environment variables 
+defined on the host running the script.  
 
 Making it work is as easy as updating your `Dockerfile` as follows:
 
