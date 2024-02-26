@@ -24,7 +24,8 @@ replaceAll() {
 
     # Iterate through each character in the line
     local lineLength=\${#line}
-    for ((i=0; i<lineLength; i++)); do
+    i=0
+    while [ $i -lt $lineLength ]; do
       local char="\${line:$i:1}"
       str="$str$char"
 
@@ -36,6 +37,8 @@ replaceAll() {
         # Append the replacement to the string
         str="\${str}\${replacement}"
       fi
+
+      i=$((i + 1))
     done
     # Set IFS for line splitting
     IFS='
