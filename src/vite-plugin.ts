@@ -34,13 +34,13 @@ export function viteEnvs(params?: {
           }) => Promise<Record<string, unknown>> | Record<string, unknown>);
     /** Default: .env */
     declarationFile?: string;
-    /** Default: false */
-    renderHtmlAsEjs?: boolean;
+    /** Default: false, requires to have node available in the container */
+    renderIndexHtmlAsAnEjsTemplate?: boolean;
 }) {
     const {
         computedEnv: computedEnv_params,
         declarationFile = ".env",
-        renderHtmlAsEjs: doRenderHtmlAsEjs = false
+        renderIndexHtmlAsAnEjsTemplate = false
     } = params ?? {};
 
     const getComputedEnv =
@@ -518,7 +518,7 @@ export function viteEnvs(params?: {
                     return buildInfos === undefined ? action_devMode() : action_buildMode();
                 };
 
-                return doRenderHtmlAsEjs ? handler_ejs : handler_noEjs;
+                return renderIndexHtmlAsAnEjsTemplate ? handler_ejs : handler_noEjs;
             })()
         },
         "closeBundle": (() => {
@@ -682,7 +682,7 @@ export function viteEnvs(params?: {
                 fs.chmodSync(scriptPath, "755");
             };
 
-            return doRenderHtmlAsEjs ? closeBundle_ejs : closeBundle_noEjs;
+            return renderIndexHtmlAsAnEjsTemplate ? closeBundle_ejs : closeBundle_noEjs;
         })()
     } satisfies Plugin;
 
