@@ -35,12 +35,12 @@ export function viteEnvs(params?: {
     /** Default: .env */
     declarationFile?: string;
     /** Default: false */
-    doRenderAsEjs?: boolean;
+    doRenderHtmlAsEjs?: boolean;
 }) {
     const {
         computedEnv: computedEnv_params,
         declarationFile = ".env",
-        doRenderAsEjs = false
+        doRenderHtmlAsEjs = false
     } = params ?? {};
 
     const getComputedEnv =
@@ -418,7 +418,7 @@ export function viteEnvs(params?: {
         },
         "transformIndexHtml": {
             "order": "pre",
-            "transform": (() => {
+            "handler": (() => {
                 const getMergedEnv = () => {
                     assert(resultOfConfigResolved !== undefined);
 
@@ -454,7 +454,7 @@ export function viteEnvs(params?: {
                     return { mergedEnv };
                 };
 
-                const transform_ejs = (html: string) => {
+                const handler_ejs = async (html: string) => {
                     assert(resultOfConfigResolved !== undefined);
 
                     const { buildInfos } = resultOfConfigResolved;
@@ -465,7 +465,7 @@ export function viteEnvs(params?: {
 
                     const { mergedEnv } = getMergedEnv();
 
-                    let processedHtml = renderHtmlAsEjs({
+                    let processedHtml = await renderHtmlAsEjs({
                         html,
                         "env": mergedEnv
                     });
@@ -483,7 +483,7 @@ export function viteEnvs(params?: {
                     return processedHtml;
                 };
 
-                const transform_noEjs = (html: string) => {
+                const handler_noEjs = (html: string) => {
                     assert(resultOfConfigResolved !== undefined);
 
                     const { buildInfos } = resultOfConfigResolved;
@@ -518,7 +518,7 @@ export function viteEnvs(params?: {
                     return buildInfos === undefined ? action_devMode() : action_buildMode();
                 };
 
-                return doRenderAsEjs ? transform_ejs : transform_noEjs;
+                return doRenderHtmlAsEjs ? handler_ejs : handler_noEjs;
             })()
         },
         "closeBundle": (() => {
@@ -682,7 +682,7 @@ export function viteEnvs(params?: {
                 fs.chmodSync(scriptPath, "755");
             };
 
-            return doRenderAsEjs ? closeBundle_ejs : closeBundle_noEjs;
+            return doRenderHtmlAsEjs ? closeBundle_ejs : closeBundle_noEjs;
         })()
     } satisfies Plugin;
 

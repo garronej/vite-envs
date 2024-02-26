@@ -9,7 +9,7 @@ import * as fs from "fs";
 import { join as pathJoin } from "path";
 import { exclude } from "tsafe/exclude";
 
-export function postBuildInjectionScript() {
+export async function postBuildInjectionScript() {
     const { assetsUrlPath, baseBuildTimeEnv, declaredEnv, computedEnv, htmlPre }: ViteEnvsMeta =
         JSON.parse(fs.readFileSync(pathJoin(process.cwd(), viteEnvsMetaFileBasename)).toString("utf8"));
 
@@ -33,7 +33,7 @@ export function postBuildInjectionScript() {
 
     let processedHtml = htmlPre;
 
-    processedHtml = renderHtmlAsEjs({
+    processedHtml = await renderHtmlAsEjs({
         "html": processedHtml,
         "env": mergedEnv
     });
