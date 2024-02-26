@@ -665,7 +665,7 @@ export function viteEnvs(params?: {
                     `script="$script      Object.keys(envWithValuesInBase64).forEach(function (key) {\n"`,
                     `script="$script        env[key] = atob(envWithValuesInBase64[key]);\n"`,
                     `script="$script      });\n"`,
-                    `script="$script      window.__VITE_ENVS = env;\n"`,
+                    `script="$script      window.${nameOfTheGlobal} = env;\n"`,
                     `script="$script    </script>"`,
                     ``,
                     `scriptPlaceholder="${placeholderForViteEnvsScript}"`,
