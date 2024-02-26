@@ -19,8 +19,12 @@ export function getScriptThatDefinesTheGlobal(params: { env: Record<string, unkn
             .replace(/^"/, "")
             .replace(/"$/, "")};`,
         `  var env = {};`,
-        `  Object.keys(envWithValuesInBase64).forEach(function (key) {`,
-        `    env[key] = atob(envWithValuesInBase64[key]);`,
+        `  Object.keys(envWithValuesInBase64).forEach(function (name) {`,
+        `    env[name] = new TextDecoder().decode(`,
+        `      Uint8Array.from(`,
+        `        atob(envWithValuesInBase64[name]),`,
+        `        c => c.charCodeAt(0))`,
+        `    );`,
         `  });`,
         `  window.${nameOfTheGlobal} = env;`,
         `</script>`
