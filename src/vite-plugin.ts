@@ -21,7 +21,6 @@ import { transformCodebase } from "./tools/transformCodebase";
 import { exclude } from "tsafe/exclude";
 import { getAbsoluteAndInOsFormatPath } from "./tools/getAbsoluteAndInOsFormatPath";
 import MagicString from "magic-string";
-import { replaceAllShDeclaration } from "./tools/replaceAll.sh";
 
 export function viteEnvs(params?: {
     computedEnv?:
@@ -608,7 +607,16 @@ export function viteEnvs(params?: {
                 const scriptContent = [
                     `#!/bin/sh`,
                     ``,
-                    replaceAllShDeclaration,
+                    `replaceAll() {`,
+                    `  inputString="$1"`,
+                    `  pattern="$2"`,
+                    `  replacement="$3"`,
+                    ``,
+                    `  echo "$inputString" | awk -v pat="$pattern" -v rep="$replacement" '{`,
+                    `    gsub(pat, rep)`,
+                    `    print`,
+                    `  }'`,
+                    `}`,
                     ``,
                     `html=$(echo "${Buffer.from(processedHtml, "utf8").toString(
                         "base64"
