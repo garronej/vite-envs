@@ -68,6 +68,36 @@ export function viteEnvs(params?: {
 
     const tmpRefString = "VITE_ENVS_TMP_REF_XS3SLW";
 
+    const getMergedEnv = () => {
+        assert(resultOfConfigResolved !== undefined);
+
+        const { baseBuildTimeEnv, declaredEnv, localEnv, computedEnv } = resultOfConfigResolved;
+
+        const mergedEnv = {
+            ...Object.fromEntries(
+                Object.entries({
+                    ...baseBuildTimeEnv,
+                    ...computedEnv
+                }).map(([key, value]) => [key, key in declaredEnv ? `${value}` : value])
+            ),
+            ...Object.fromEntries(
+                Object.entries(declaredEnv).filter(
+                    ([key, value]) => !(key in computedEnv && value === "")
+                )
+            ),
+            ...Object.fromEntries(
+                Object.entries(process.env)
+                    .map(([key, value]) => (value === undefined ? undefined : ([key, value] as const)))
+                    .filter(exclude(undefined))
+                    .filter(([, value]) => value !== "")
+                    .filter(([key, value]) => key in declaredEnv && value !== declaredEnv[key])
+            ),
+            ...localEnv
+        };
+
+        return { mergedEnv };
+    };
+
     const plugin = {
         "name": "vite-envs",
         "configResolved": async resolvedConfig => {
@@ -421,41 +451,6 @@ export function viteEnvs(params?: {
         "transformIndexHtml": {
             "order": "pre",
             "handler": (() => {
-                const getMergedEnv = () => {
-                    assert(resultOfConfigResolved !== undefined);
-
-                    const { baseBuildTimeEnv, declaredEnv, localEnv, computedEnv } =
-                        resultOfConfigResolved;
-
-                    const mergedEnv = {
-                        ...Object.fromEntries(
-                            Object.entries({
-                                ...baseBuildTimeEnv,
-                                ...computedEnv
-                            }).map(([key, value]) => [key, key in declaredEnv ? `${value}` : value])
-                        ),
-                        ...Object.fromEntries(
-                            Object.entries(declaredEnv).filter(
-                                ([key, value]) => !(key in computedEnv && value === "")
-                            )
-                        ),
-                        ...Object.fromEntries(
-                            Object.entries(process.env)
-                                .map(([key, value]) =>
-                                    value === undefined ? undefined : ([key, value] as const)
-                                )
-                                .filter(exclude(undefined))
-                                .filter(([, value]) => value !== "")
-                                .filter(
-                                    ([key, value]) => key in declaredEnv && value !== declaredEnv[key]
-                                )
-                        ),
-                        ...localEnv
-                    };
-
-                    return { mergedEnv };
-                };
-
                 const handler_ejs = async (html: string) => {
                     assert(resultOfConfigResolved !== undefined);
 
@@ -577,6 +572,25 @@ export function viteEnvs(params?: {
                     (_, key) => `%${key}%`
                 );
 
+                // NOTE: Make is so running the ./vite-envs.sh script is optional.
+                ((processedHtml: string) => {
+                    const { mergedEnv } = getMergedEnv();
+
+                    processedHtml = substituteHtmPlaceholders({
+                        "html": processedHtml,
+                        "env": mergedEnv
+                    });
+
+                    processedHtml = injectInHeadBeforeFirstScriptTag({
+                        "html": processedHtml,
+                        "htmlToInject": getScriptThatDefinesTheGlobal({
+                            "env": mergedEnv
+                        })
+                    });
+
+                    fs.writeFileSync(indexHtmlFilePath, Buffer.from(processedHtml, "utf8"));
+                })(processedHtml);
+
                 const placeholderForViteEnvsScript = `<!-- vite-envs script placeholder xKsPmLs30swKsdIsVx -->`;
 
                 processedHtml = injectInHeadBeforeFirstScriptTag({
@@ -584,9 +598,11 @@ export function viteEnvs(params?: {
                     "htmlToInject": placeholderForViteEnvsScript
                 });
 
-                fs.writeFileSync(indexHtmlFilePath, Buffer.from(processedHtml, "utf8"));
+                const scriptPath = pathJoin(distDirPath, "vite-envs.sh");
 
-                const mergedEnv = {
+                const singularString = "xPsZs9swrPvxYpC";
+
+                const buildTimeMergedEnv = {
                     ...Object.fromEntries(
                         Object.entries({
                             ...baseBuildTimeEnv,
@@ -599,10 +615,6 @@ export function viteEnvs(params?: {
                         )
                     )
                 };
-
-                const scriptPath = pathJoin(distDirPath, "vite-envs.sh");
-
-                const singularString = "xPsZs9swrPvxYpC";
 
                 const scriptContent = [
                     `#!/bin/sh`,
@@ -622,7 +634,7 @@ export function viteEnvs(params?: {
                         "base64"
                     )}" | base64 -d)`,
                     ``,
-                    ...Object.entries(mergedEnv)
+                    ...Object.entries(buildTimeMergedEnv)
                         .map(([name, value]) => {
                             const valueB64 = Buffer.from(`${value}`, "utf8").toString("base64");
 
@@ -637,19 +649,19 @@ export function viteEnvs(params?: {
                     ``,
                     `processedHtml="$html"`,
                     ``,
-                    ...Object.keys(mergedEnv).map(
+                    ...Object.keys(buildTimeMergedEnv).map(
                         name =>
                             `processedHtml=$(replaceAll "$processedHtml" "%${name}%" "${name}${singularString}")`
                     ),
                     ``,
-                    ...Object.keys(mergedEnv).map(
+                    ...Object.keys(buildTimeMergedEnv).map(
                         name =>
                             `processedHtml=$(replaceAll "$processedHtml" "${name}${singularString}" "\$${name}")`
                     ),
                     ``,
                     `json=""`,
                     `json="$json{"`,
-                    ...Object.keys(mergedEnv).map(
+                    ...Object.keys(buildTimeMergedEnv).map(
                         (name, i, names) =>
                             `json="$json\\"${name}\\":\\"\$${name}_base64\\"${
                                 i === names.length - 1 ? "" : ","
