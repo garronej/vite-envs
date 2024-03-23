@@ -624,13 +624,13 @@ export function viteEnvs(params?: {
                     `    export pattern="$2"`,
                     `    export replacement="$3"`,
                     ``,
-                    `    echo "$inputString" | awk '{`,
+                    `    echo -n "$inputString" | awk '{`,
                     `        gsub(ENVIRON["pattern"], ENVIRON["replacement"])`,
                     `        print`,
                     `    }'`,
                     `}`,
                     ``,
-                    `html=$(echo "${Buffer.from(processedHtml, "utf8").toString(
+                    `html=$(echo -n "${Buffer.from(processedHtml, "utf8").toString(
                         "base64"
                     )}" | base64 -d)`,
                     ``,
@@ -640,9 +640,9 @@ export function viteEnvs(params?: {
 
                             return [
                                 name in declaredEnv
-                                    ? `${name}=\${${name}:-$(echo "${valueB64}" | base64 -d)}`
-                                    : `${name}=$(echo "${valueB64}" | base64 -d)`,
-                                `${name}_base64=\$(echo "\$${name}" | base64)`
+                                    ? `${name}=\${${name}:-$(echo -n "${valueB64}" | base64 -d)}`
+                                    : `${name}=$(echo -n "${valueB64}" | base64 -d)`,
+                                `${name}_base64=\$(echo -n "\$${name}" | base64)`
                             ];
                         })
                         .flat(),
@@ -689,7 +689,7 @@ export function viteEnvs(params?: {
                     ``,
                     `DIR=$(cd "$(dirname "$0")" && pwd)`,
                     ``,
-                    `echo "$processedHtml" > "$DIR/index.html"`,
+                    `echo -n "$processedHtml" > "$DIR/index.html"`,
                     ``
                 ].join("\n");
 
