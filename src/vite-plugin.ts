@@ -28,7 +28,7 @@ export function viteEnvs(params?: {
         | ((params: {
               resolvedConfig: ResolvedConfig;
               declaredEnv: Record<string, string>;
-              localEnv: Record<string, string>;
+              dotEnvLocal: Record<string, string>;
           }) => Promise<Record<string, unknown>> | Record<string, unknown>);
     /** Default: .env */
     declarationFile?: string;
@@ -54,7 +54,8 @@ export function viteEnvs(params?: {
               baseBuildTimeEnv: Record<string, unknown>;
               declaredEnv: Record<string, string>;
               computedEnv: Record<string, unknown>;
-              localEnv: Record<string, string>;
+              dotEnv: Record<string, string>;
+              dotEnvLocal: Record<string, string>;
               shouldGenerateSourcemap: boolean;
               buildInfos:
                   | {
@@ -71,7 +72,8 @@ export function viteEnvs(params?: {
     const getMergedEnv = () => {
         assert(resultOfConfigResolved !== undefined);
 
-        const { baseBuildTimeEnv, declaredEnv, localEnv, computedEnv } = resultOfConfigResolved;
+        const { baseBuildTimeEnv, declaredEnv, dotEnv, dotEnvLocal, computedEnv } =
+            resultOfConfigResolved;
 
         const mergedEnv = {
             ...Object.fromEntries(
@@ -85,14 +87,17 @@ export function viteEnvs(params?: {
                     ([key, value]) => !(key in computedEnv && value === "")
                 )
             ),
+            ...(declarationFile === ".env" ? undefined : dotEnv),
+            ...dotEnvLocal,
             ...Object.fromEntries(
                 Object.entries(process.env)
                     .map(([key, value]) => (value === undefined ? undefined : ([key, value] as const)))
                     .filter(exclude(undefined))
-                    .filter(([, value]) => value !== "")
-                    .filter(([key, value]) => key in declaredEnv && value !== declaredEnv[key])
-            ),
-            ...localEnv
+                    .filter(([key]) => key in declaredEnv)
+                    // NOTE: process.env is loaded by default with the .env file. We don't want to override the values of the .env.local
+                    // but still want to apply the values that might have explicitly been set for example with `TITLE="foo" yarn build`
+                    .filter(([key, value]) => !(key in dotEnv) || dotEnv[key] !== value)
+            )
         };
 
         return { mergedEnv };
@@ -126,42 +131,32 @@ export function viteEnvs(params?: {
                 return parsed;
             })();
 
-            const localEnv = (() => {
-                let envLocal: Record<string, string> = {};
+            const [dotEnv, dotEnvLocal] = [".env", ".env.local"].map(fileBasename => {
+                const filePath = pathJoin(appRootDirPath, fileBasename);
 
-                [".env", ".env.local"].forEach(fileBasename => {
-                    const filePath = pathJoin(appRootDirPath, fileBasename);
+                if (!fs.existsSync(filePath)) {
+                    return {};
+                }
 
-                    if (!fs.existsSync(filePath)) {
-                        return {};
-                    }
-
-                    const { parsed } = dotenv.config({
-                        "path": filePath,
-                        "encoding": "utf8"
-                    });
-
-                    assert(parsed !== undefined);
-
-                    envLocal = {
-                        ...envLocal,
-                        ...parsed
-                    };
+                const { parsed } = dotenv.config({
+                    "path": filePath,
+                    "encoding": "utf8"
                 });
 
-                return Object.fromEntries(
-                    Object.entries(envLocal).filter(([key]) => key in declaredEnv)
-                );
-            })();
+                assert(parsed !== undefined);
 
-            const computedEnv = await getComputedEnv({ resolvedConfig, localEnv, declaredEnv });
+                return Object.fromEntries(Object.entries(parsed).filter(([key]) => key in declaredEnv));
+            });
+
+            const computedEnv = await getComputedEnv({ resolvedConfig, declaredEnv, dotEnvLocal });
 
             resultOfConfigResolved = {
                 appRootDirPath,
                 baseBuildTimeEnv,
                 declaredEnv,
                 computedEnv,
-                localEnv,
+                dotEnv,
+                dotEnvLocal,
                 "shouldGenerateSourcemap": resolvedConfig.build.sourcemap !== false,
                 "buildInfos": undefined
             };
