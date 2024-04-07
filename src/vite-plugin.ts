@@ -619,25 +619,25 @@ export function viteEnvs(params?: {
                     `    export pattern="$2"`,
                     `    export replacement="$3"`,
                     ``,
-                    `    echo -n "$inputString" | awk '{`,
+                    `    echo "$inputString" | awk '{`,
                     `        gsub(ENVIRON["pattern"], ENVIRON["replacement"])`,
                     `        print`,
                     `    }'`,
                     `}`,
                     ``,
-                    `html=$(echo -n "${Buffer.from(processedHtml, "utf8").toString(
+                    `html=$(echo "${Buffer.from(processedHtml, "utf8").toString(
                         "base64"
                     )}" | base64 -d)`,
                     ``,
                     ...Object.entries(buildTimeMergedEnv)
                         .map(([name, value]) => {
-                            const valueB64 = Buffer.from(`${value}`, "utf8").toString("base64");
+                            const valueB64 = Buffer.from(`${value}\n`, "utf8").toString("base64");
 
                             return [
+                                `${name}_base64=$((printenv ${name} || echo "${valueB64}" | base64 -d) | base64)`,
                                 name in declaredEnv
-                                    ? `${name}=\${${name}:-$(echo -n "${valueB64}" | base64 -d)}`
-                                    : `${name}=$(echo -n "${valueB64}" | base64 -d)`,
-                                `${name}_base64=\$(echo -n "\$${name}" | base64)`
+                                    ? `${name}=\${${name}:-$(echo "${valueB64}" | base64 -d)}`
+                                    : `${name}=$(echo "${valueB64}" | base64 -d)`
                             ];
                         })
                         .flat(),
@@ -673,7 +673,7 @@ export function viteEnvs(params?: {
                     `          Uint8Array.from(`,
                     `            atob(envWithValuesInBase64[name]),`,
                     `            c => c.charCodeAt(0))`,
-                    `        );`,
+                    `        ).slice(0,-1);`,
                     `      });`,
                     `      window.${nameOfTheGlobal} = env;`,
                     `    </script>"`,
@@ -684,7 +684,7 @@ export function viteEnvs(params?: {
                     ``,
                     `DIR=$(cd "$(dirname "$0")" && pwd)`,
                     ``,
-                    `echo -n "$processedHtml" > "$DIR/index.html"`,
+                    `echo "$processedHtml" > "$DIR/index.html"`,
                     ``
                 ].join("\n");
 
