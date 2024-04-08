@@ -633,11 +633,20 @@ export function viteEnvs(params?: {
                         .map(([name, value]) => {
                             const valueB64 = Buffer.from(`${value}\n`, "utf8").toString("base64");
 
+                            if (!(name in declaredEnv)) {
+                                return [
+                                    `${name}_base64="${valueB64}"`,
+                                    `${name}=$(echo "${valueB64}" | base64 -d)`
+                                ];
+                            }
+
                             return [
-                                `${name}_base64=$((printenv ${name} || echo "${valueB64}" | base64 -d) | base64)`,
-                                name in declaredEnv
-                                    ? `${name}=\${${name}:-$(echo "${valueB64}" | base64 -d)}`
-                                    : `${name}=$(echo "${valueB64}" | base64 -d)`
+                                `if printenv ${name} &> /dev/null; then`,
+                                `    ${name}_base64=$(printenv ${name} | base64)`,
+                                `else`,
+                                `    ${name}_base64="${valueB64}"`,
+                                `fi`,
+                                `${name}=\${${name}:-$(echo "${valueB64}" | base64 -d)}`
                             ];
                         })
                         .flat(),
