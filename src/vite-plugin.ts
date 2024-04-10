@@ -680,7 +680,7 @@ export function viteEnvs(params?: {
                     `      Object.keys(envWithValuesInBase64).forEach(function (name) {`,
                     `        env[name] = new TextDecoder().decode(`,
                     `          Uint8Array.from(`,
-                    `            atob(envWithValuesInBase64[name].replace(/\\\\\\n/g, '')),`,
+                    `            atob(envWithValuesInBase64[name]),`,
                     `            c => c.charCodeAt(0))`,
                     `        ).slice(0,-1);`,
                     `      });`,
