@@ -667,7 +667,7 @@ export function viteEnvs(params?: {
                     `json="$json{"`,
                     ...Object.keys(buildTimeMergedEnv).map(
                         (name, i, names) =>
-                            `json="$json\\"${name}\\":\\"\$${name}_base64\\"${
+                            `json="$json\\"${name}\\":\\\`\$${name}_base64\\\`${
                                 i === names.length - 1 ? "" : ","
                             }"`
                     ),
@@ -680,7 +680,7 @@ export function viteEnvs(params?: {
                     `      Object.keys(envWithValuesInBase64).forEach(function (name) {`,
                     `        env[name] = new TextDecoder().decode(`,
                     `          Uint8Array.from(`,
-                    `            atob(envWithValuesInBase64[name]),`,
+                    `            atob(envWithValuesInBase64[name].replace(/\\\\\\n/g, '')),`,
                     `            c => c.charCodeAt(0))`,
                     `        ).slice(0,-1);`,
                     `      });`,
