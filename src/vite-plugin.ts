@@ -94,9 +94,6 @@ export function viteEnvs(params?: {
                     .map(([key, value]) => (value === undefined ? undefined : ([key, value] as const)))
                     .filter(exclude(undefined))
                     .filter(([key]) => key in declaredEnv)
-                    // NOTE: process.env is loaded by default with the .env file. We don't want to override the values of the .env.local
-                    // but still want to apply the values that might have explicitly been set for example with `TITLE="foo" yarn build`
-                    .filter(([key, value]) => !(key in dotEnv) || dotEnv[key] !== value)
             )
         };
 
@@ -123,7 +120,8 @@ export function viteEnvs(params?: {
 
                 const { parsed } = dotenv.config({
                     "path": declarationEnvFilePath,
-                    "encoding": "utf8"
+                    "encoding": "utf8",
+                    "processEnv": {}
                 });
 
                 assert(parsed !== undefined);
@@ -140,7 +138,8 @@ export function viteEnvs(params?: {
 
                 const { parsed } = dotenv.config({
                     "path": filePath,
-                    "encoding": "utf8"
+                    "encoding": "utf8",
+                    "processEnv": {}
                 });
 
                 assert(parsed !== undefined);
