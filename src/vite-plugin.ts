@@ -396,7 +396,7 @@ export function viteEnvs(params?: {
                 /import\.meta\.env(?:\.([A-Za-z0-9$_]+)|\["([^"]+)"\]|(.?))/g,
                 (match, p1, p2, p3) => {
                     const out = (() => {
-                        const globalRef = `(typeof window === "undefined" ? self : window).${nameOfTheGlobal}`;
+                        const globalRef = `window.${nameOfTheGlobal}`;
 
                         if (p3 !== undefined) {
                             return `${globalRef}${p3}`;
