@@ -21,6 +21,7 @@ import { transformCodebase } from "./tools/transformCodebase";
 import { exclude } from "tsafe/exclude";
 import { getAbsoluteAndInOsFormatPath } from "./tools/getAbsoluteAndInOsFormatPath";
 import MagicString from "magic-string";
+import { createSwEnvJsFile } from "./createSwEnvJsFile";
 
 export function viteEnvs(params?: {
     computedEnv?:
@@ -544,6 +545,10 @@ export function viteEnvs(params?: {
                     pathJoin(distDirPath, viteEnvsMetaFileBasename),
                     Buffer.from(JSON.stringify(viteEnvsMeta, null, 4), "utf8")
                 );
+
+                const { mergedEnv } = getMergedEnv();
+
+                createSwEnvJsFile({ distDirPath, mergedEnv });
             };
             const closeBundle_noEjs = () => {
                 assert(resultOfConfigResolved !== undefined);
@@ -584,35 +589,7 @@ export function viteEnvs(params?: {
 
                     fs.writeFileSync(indexHtmlFilePath, Buffer.from(processedHtml, "utf8"));
 
-                    {
-                        const envWithValuesInBase64 = Object.fromEntries(
-                            Object.entries(mergedEnv).map(([key, value]) => [
-                                key,
-                                Buffer.from(`${value}`, "utf8").toString("base64")
-                            ])
-                        );
-
-                        const swEnv = [
-                            `const envWithValuesInBase64 = ${JSON.stringify(
-                                envWithValuesInBase64,
-                                null,
-                                2
-                            )
-                                .replace(/^"/, "")
-                                .replace(/"$/, "")};`,
-                            `const env = {};`,
-                            `Object.keys(envWithValuesInBase64).forEach(function (name) {`,
-                            `  env[name] = new TextDecoder().decode(`,
-                            `    Uint8Array.from(`,
-                            `      atob(envWithValuesInBase64[name]),`,
-                            `      c => c.charCodeAt(0))`,
-                            `  );`,
-                            `});`,
-                            `self.${nameOfTheGlobal} = env;`
-                        ].join("\n");
-
-                        fs.writeFileSync(pathJoin(distDirPath, "swEnv.js"), Buffer.from(swEnv, "utf8"));
-                    }
+                    createSwEnvJsFile({ distDirPath, mergedEnv });
                 })(processedHtml);
 
                 const placeholderForViteEnvsScript = `<!-- vite-envs script placeholder xKsPmLs30swKsdIsVx -->`;

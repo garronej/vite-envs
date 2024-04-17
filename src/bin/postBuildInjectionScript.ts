@@ -8,6 +8,7 @@ import * as cheerio from "cheerio";
 import * as fs from "fs";
 import { join as pathJoin } from "path";
 import { exclude } from "tsafe/exclude";
+import { createSwEnvJsFile } from "../createSwEnvJsFile";
 
 export async function postBuildInjectionScript() {
     const { assetsUrlPath, baseBuildTimeEnv, declaredEnv, computedEnv, htmlPre }: ViteEnvsMeta =
@@ -45,7 +46,9 @@ export async function postBuildInjectionScript() {
 
     const $pre_head = cheerio.load(processedHtml)("head");
 
-    const indexHtmlFilePath = pathJoin(process.cwd(), "index.html");
+    const cwd = process.cwd();
+
+    const indexHtmlFilePath = pathJoin(cwd, "index.html");
 
     const $post = cheerio.load(fs.readFileSync(indexHtmlFilePath).toString("utf8"));
 
@@ -62,4 +65,6 @@ export async function postBuildInjectionScript() {
     });
 
     fs.writeFileSync(indexHtmlFilePath, Buffer.from(processedHtml, "utf8"));
+
+    createSwEnvJsFile({ "distDirPath": cwd, mergedEnv });
 }
