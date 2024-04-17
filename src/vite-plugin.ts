@@ -583,6 +583,36 @@ export function viteEnvs(params?: {
                     });
 
                     fs.writeFileSync(indexHtmlFilePath, Buffer.from(processedHtml, "utf8"));
+
+                    {
+                        const envWithValuesInBase64 = Object.fromEntries(
+                            Object.entries(mergedEnv).map(([key, value]) => [
+                                key,
+                                Buffer.from(`${value}`, "utf8").toString("base64")
+                            ])
+                        );
+
+                        const swEnv = [
+                            `const envWithValuesInBase64 = ${JSON.stringify(
+                                envWithValuesInBase64,
+                                null,
+                                2
+                            )
+                                .replace(/^"/, "")
+                                .replace(/"$/, "")};`,
+                            `const env = {};`,
+                            `Object.keys(envWithValuesInBase64).forEach(function (name) {`,
+                            `  env[name] = new TextDecoder().decode(`,
+                            `    Uint8Array.from(`,
+                            `      atob(envWithValuesInBase64[name]),`,
+                            `      c => c.charCodeAt(0))`,
+                            `  );`,
+                            `});`,
+                            `self.${nameOfTheGlobal} = env;`
+                        ].join("\n");
+
+                        fs.writeFileSync(pathJoin(distDirPath, "swEnv.js"), Buffer.from(swEnv, "utf8"));
+                    }
                 })(processedHtml);
 
                 const placeholderForViteEnvsScript = `<!-- vite-envs script placeholder xKsPmLs30swKsdIsVx -->`;
@@ -693,6 +723,21 @@ export function viteEnvs(params?: {
                     `DIR=$(cd "$(dirname "$0")" && pwd)`,
                     ``,
                     `echo "$processedHtml" > "$DIR/index.html"`,
+                    ``,
+                    `swEnv_script="`,
+                    `const envWithValuesInBase64 = $json;`,
+                    `const env = {};`,
+                    `Object.keys(envWithValuesInBase64).forEach(function (name) {`,
+                    `  env[name] = new TextDecoder().decode(`,
+                    `    Uint8Array.from(`,
+                    `      atob(envWithValuesInBase64[name]),`,
+                    `      c => c.charCodeAt(0))`,
+                    `  ).slice(0,-1);`,
+                    `});`,
+                    `self.${nameOfTheGlobal} = env;`,
+                    `"`,
+                    ``,
+                    `echo "$swEnv_script" > "$DIR/swEnv.js"`,
                     ``
                 ].join("\n");
 
