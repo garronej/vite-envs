@@ -65,6 +65,9 @@ Making it work is as easy as updating your `Dockerfile` as follows:
 +ENTRYPOINT sh -c "./vite-envs.sh && nginx -g 'daemon off;'"
 ```  
 
+One thing to note is that running the `vite-envs.sh` script is fully optional.
+If you don't your app will still work as it normally would.  
+
 # Types  
 
 One notable benefit of using `vite-envs` is you're getting strict types definitions for `import.meta.env`.  
