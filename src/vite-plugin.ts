@@ -4,7 +4,8 @@ import {
     posix as posixPath,
     resolve as pathResolve,
     basename as pathBasename,
-    relative as pathRelative
+    relative as pathRelative,
+    normalize as pathNormalize
 } from "path";
 import type { Plugin, ResolvedConfig } from "vite";
 import { assert } from "tsafe/assert";
@@ -371,7 +372,9 @@ export function viteEnvs(params?: {
             } = resultOfConfigResolved;
 
             {
-                const isWithinSourceDirectory = id.startsWith(pathJoin(appRootDirPath, "src") + pathSep);
+                const isWithinSourceDirectory = pathNormalize(id).startsWith(
+                    pathNormalize(pathJoin(appRootDirPath, "src") + pathSep)
+                );
 
                 if (!isWithinSourceDirectory) {
                     return;
