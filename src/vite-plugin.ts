@@ -371,8 +371,10 @@ export function viteEnvs(params?: {
                 shouldGenerateSourcemap
             } = resultOfConfigResolved;
 
+            const filePath = pathNormalize(id);
+
             {
-                const isWithinSourceDirectory = pathNormalize(id).startsWith(
+                const isWithinSourceDirectory = filePath.startsWith(
                     pathNormalize(pathJoin(appRootDirPath, "src") + pathSep)
                 );
 
@@ -382,8 +384,8 @@ export function viteEnvs(params?: {
             }
 
             {
-                const isJavascriptFile = id.endsWith(".js") || id.endsWith(".jsx");
-                const isTypeScriptFile = id.endsWith(".ts") || id.endsWith(".tsx");
+                const isJavascriptFile = filePath.endsWith(".js") || filePath.endsWith(".jsx");
+                const isTypeScriptFile = filePath.endsWith(".ts") || filePath.endsWith(".tsx");
 
                 if (!isTypeScriptFile && !isJavascriptFile) {
                     return;
@@ -436,7 +438,7 @@ export function viteEnvs(params?: {
             }
 
             const map = transformedCode.generateMap({
-                "source": id,
+                "source": filePath,
                 "includeContent": true,
                 "hires": true
             });
