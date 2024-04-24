@@ -361,6 +361,11 @@ export function viteEnvs(params?: {
             }
         },
         "transform": (code, id) => {
+            // Skip special files.
+            if (id.startsWith("\x00")) {
+                return null;
+            }
+
             assert(resultOfConfigResolved !== undefined);
 
             const {
