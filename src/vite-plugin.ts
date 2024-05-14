@@ -11,7 +11,6 @@ import type { Plugin, ResolvedConfig } from "vite";
 import { assert } from "tsafe/assert";
 import { getThisCodebaseRootDirPath } from "./tools/getThisCodebaseRootDirPath";
 import * as fs from "fs";
-import * as dotenv from "dotenv";
 import { nameOfTheGlobal, viteEnvsMetaFileBasename, updateTypingScriptEnvName } from "./constants";
 import { getScriptThatDefinesTheGlobal } from "./getScriptThatDefinesTheGlobal";
 import { injectInHeadBeforeFirstScriptTag } from "./injectInHeadBeforeFirstScriptTag";
@@ -23,6 +22,7 @@ import { exclude } from "tsafe/exclude";
 import { getAbsoluteAndInOsFormatPath } from "./tools/getAbsoluteAndInOsFormatPath";
 import MagicString from "magic-string";
 import { createSwEnvJsFile } from "./createSwEnvJsFile";
+import { parseDotEnv } from "./parseDotEnv";
 
 export function viteEnvs(params?: {
     computedEnv?:
@@ -120,13 +120,9 @@ export function viteEnvs(params?: {
                     );
                 }
 
-                const { parsed } = dotenv.config({
-                    "path": declarationEnvFilePath,
-                    "encoding": "utf8",
-                    "processEnv": {}
+                const parsed = parseDotEnv({
+                    "path": declarationEnvFilePath
                 });
-
-                assert(parsed !== undefined);
 
                 return parsed;
             })();
@@ -138,13 +134,9 @@ export function viteEnvs(params?: {
                     return {};
                 }
 
-                const { parsed } = dotenv.config({
-                    "path": filePath,
-                    "encoding": "utf8",
-                    "processEnv": {}
+                const parsed = parseDotEnv({
+                    "path": filePath
                 });
-
-                assert(parsed !== undefined);
 
                 return Object.fromEntries(Object.entries(parsed).filter(([key]) => key in declaredEnv));
             });
