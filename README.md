@@ -65,8 +65,8 @@ Making it work is as easy as updating your `Dockerfile` as follows:
 +ENTRYPOINT sh -c "./vite-envs.sh && nginx -g 'daemon off;'"
 ```  
 
-One thing to note is that running the `vite-envs.sh` script is fully optional.
-If you don't your app will still work as it normally would.  
+One thing to note is that running the `vite-envs.sh` script is only required to utilize this plugin, not all the time.
+If you don't use it, your app will still work as it normally would without dynamic environment variable support.  
 
 # Types  
 
