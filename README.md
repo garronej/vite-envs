@@ -57,7 +57,9 @@ When you build your app (`vite build`) it generate a `dist/vite-envs.sh` script.
 When executed, this script updates the `dist/index.html` by injecting the environment variables 
 defined on the host running the script.  
 
-Making it work is as easy as updating your `Dockerfile` as follows:
+So, to make the dynamic injection of environment variables take place, you simply need to run the `vite-envs.sh` script 
+before starting your web server.  
+In practice, the diff that you would need to apply to your `Dockerfile` would look something like this:    
 
 `Dockerfile`  
 ```diff
@@ -67,8 +69,7 @@ Making it work is as easy as updating your `Dockerfile` as follows:
 
 # Types  
 
-One notable benefit of using `vite-envs` is you're getting strict types definitions for `import.meta.env`.  
-Definitions are even hot reloaded!  
+Unrelated to the dynamic injection of environment variables, `vite-envs` also brings strict typing for `import.meta.env`.  
 
 [types-hot-reloading.webm](https://github.com/garronej/vite-envs/assets/6702424/78113d59-ac59-46b6-ada2-c325f475256c)
 
