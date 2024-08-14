@@ -6,7 +6,7 @@
     <br>
     <br>
     <a href="https://github.com/garronej/vite-envs/actions">
-      <img src="https://github.com/garronej/vite-envs/workflows/ci/badge.svg?branch=main">
+      <img src="https://github.com/garronej/vite-envs/actions/workflows/ci.yaml/badge.svg?branch=main">
     </a>
      <a href="https://www.npmjs.com/package/vite-envs">
       <img src="https://img.shields.io/npm/v/vite-envs">
