@@ -351,6 +351,11 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.2.tgz#5950e50960793055845e956c427fc2b0d70c5239"
   integrity sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==
 
+"@vercel/ncc@^0.38.1":
+  version "0.38.1"
+  resolved "https://registry.yarnpkg.com/@vercel/ncc/-/ncc-0.38.1.tgz#13f08738111e1d9e8a22fd6141f3590e54d9a60e"
+  integrity sha512-IBBb+iI2NLu4VQn3Vwldyi2QwaXt5+hTyh58ggAMoCGE6DJmPvwL3KPBWcJl1m9LYPChBLE980Jw+CS4Wokqxw==
+
 aggregate-error@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/aggregate-error/-/aggregate-error-3.1.0.tgz#92670ff50f5359bdb7a3e0d40d0ec30c5737687a"
@@ -1353,10 +1358,10 @@ postcss@^8.4.35:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-powerhooks@^1.0.12:
-  version "1.0.12"
-  resolved "https://registry.yarnpkg.com/powerhooks/-/powerhooks-1.0.12.tgz#772853776343af3ad3c7cd9c95c99432d8a325de"
-  integrity sha512-KBgUbUbm7XwFRIubNS6rwZMdSHGz97LAWPP6tSbBxI9nu1sIdrL7HDs/JRe6OZmv7zjw/G10JxPcJMKFtsHLSA==
+powerhooks@^1.0.13:
+  version "1.0.13"
+  resolved "https://registry.yarnpkg.com/powerhooks/-/powerhooks-1.0.13.tgz#4642d7c16bdc31d444403f18e0fac26bf7e96ad6"
+  integrity sha512-nDDYfklVEWcYLkKVtVxxb0UA5pUkkmAHOxWOAveTZT6LJDZelcc8cDsuoQO1zjQkkAFO3l4COyJ/8v2tJGOOEQ==
   dependencies:
     evt "^2.5.7"
     memoizee "^0.4.15"

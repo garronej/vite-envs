@@ -35,7 +35,7 @@ fs.rmSync(".yarn_home", { recursive: true, force: true });
 run("yarn install");
 run("yarn build");
 
-const starterName = "keycloakify-starter";
+const starterName = "vite-envs-starter";
 
 fs.rmSync(join("..", starterName, "node_modules"), {
     recursive: true,

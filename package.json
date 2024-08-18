@@ -15,13 +15,12 @@
         "format:check": "yarn _format --list-different"
     },
     "bin": {
-        "vite-envs": "dist/bin/vite-envs.js"
+        "vite-envs": "dist/bin/main.js"
     },
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "exports": {
         ".": "./dist/index.js",
-        "./*": "./dist/*.js",
         "./client": "./client.d.ts",
         "./types/hot": "./types/hot.d.ts",
         "./types/importGlob": "./types/importGlob.d.ts"
@@ -40,12 +39,14 @@
     "license": "MIT",
     "files": [
         "src/",
-        "dist/",
-        "!dist/tsconfig.tsbuildinfo"
+        "dist/index.js",
+        "dist/index.d.ts",
+        "dist/vite-plugin.d.ts",
+        "dist/bin/main.js"
     ],
     "keywords": [
         "react",
-        "create-react-app",
+        "vite",
         "environment-variables",
         "typescript"
     ],
@@ -68,6 +69,9 @@
         "magic-string": "^0.30.7",
         "tsafe": "^1.7.2",
         "chokidar": "^3.6.0",
-        "powerhooks": "^1.0.12"
+        "powerhooks": "^1.0.13",
+        "@vercel/ncc": "^0.38.1",
+        "evt": "^2.5.7",
+        "run-exclusive": "^2.2.19"
     }
 }
