@@ -13,7 +13,7 @@ export function createSwEnvJsFile(params: Params) {
     const envWithValuesInBase64 = Object.fromEntries(
         Object.entries(mergedEnv).map(([key, value]) => [
             key,
-            Buffer.from(`${value}`, "utf8").toString("base64")
+            Buffer.from(JSON.stringify(value), "utf8").toString("base64")
         ])
     );
 
@@ -29,11 +29,14 @@ export function createSwEnvJsFile(params: Params) {
             .replace(/"$/, "")};`,
         `const env = {};`,
         `Object.keys(envWithValuesInBase64).forEach(function (name) {`,
-        `  env[name] = new TextDecoder().decode(`,
-        `    Uint8Array.from(`,
-        `      atob(envWithValuesInBase64[name]),`,
-        `      c => c.charCodeAt(0))`,
-        `  );`,
+        `    env[name] = JSON.parse(`,
+        `      new TextDecoder().decode(`,
+        `        Uint8Array.from(`,
+        `          atob(envWithValuesInBase64[name]),`,
+        `          c => c.charCodeAt(0)`,
+        `        )`,
+        `      )`,
+        `    );`,
         `});`,
         `self.${nameOfTheGlobal} = env;`
     ].join("\n");

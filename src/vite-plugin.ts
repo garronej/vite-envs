@@ -605,6 +605,7 @@ export function viteEnvs(params?: {
                 const scriptPath = pathJoin(distDirPath, "vite-envs.sh");
 
                 const singularString = "xPsZs9swrPvxYpC";
+                const singularString2 = "xApWdRrX99kPrVggE";
 
                 const buildTimeMergedEnv = {
                     ...Object.fromEntries(
@@ -640,7 +641,10 @@ export function viteEnvs(params?: {
                     ``,
                     ...Object.entries(buildTimeMergedEnv)
                         .map(([name, value]) => {
-                            const valueB64 = Buffer.from(`${value}\n`, "utf8").toString("base64");
+                            const valueB64 = Buffer.from(
+                                `${singularString2}${JSON.stringify(value)}\n`,
+                                "utf8"
+                            ).toString("base64");
 
                             if (!(name in declaredEnv)) {
                                 return [
@@ -687,11 +691,12 @@ export function viteEnvs(params?: {
                     `      var envWithValuesInBase64 = $json;`,
                     `      var env = {};`,
                     `      Object.keys(envWithValuesInBase64).forEach(function (name) {`,
-                    `        env[name] = new TextDecoder().decode(`,
+                    `        const value = new TextDecoder().decode(`,
                     `          Uint8Array.from(`,
                     `            atob(envWithValuesInBase64[name]),`,
                     `            c => c.charCodeAt(0))`,
                     `        ).slice(0,-1);`,
+                    `        env[name] = value.startsWith("${singularString2}") ? JSON.parse(value.slice("${singularString2}".length)) : value;`,
                     `      });`,
                     `      window.${nameOfTheGlobal} = env;`,
                     `    </script>"`,
@@ -708,11 +713,12 @@ export function viteEnvs(params?: {
                     `const envWithValuesInBase64 = $json;`,
                     `const env = {};`,
                     `Object.keys(envWithValuesInBase64).forEach(function (name) {`,
-                    `  env[name] = new TextDecoder().decode(`,
+                    `  const value = new TextDecoder().decode(`,
                     `    Uint8Array.from(`,
                     `      atob(envWithValuesInBase64[name]),`,
                     `      c => c.charCodeAt(0))`,
                     `  ).slice(0,-1);`,
+                    `  env[name] = value.startsWith("${singularString2}") ? JSON.parse(value.slice("${singularString2}".length)) : value;`,
                     `});`,
                     `self.${nameOfTheGlobal} = env;`,
                     `"`,

@@ -9,7 +9,7 @@ export function getScriptThatDefinesTheGlobal(params: { env: Record<string, unkn
     const envWithValuesInBase64 = Object.fromEntries(
         Object.entries(env).map(([key, value]) => [
             key,
-            Buffer.from(`${value}`, "utf8").toString("base64")
+            Buffer.from(JSON.stringify(value), "utf8").toString("base64")
         ])
     );
 
@@ -20,10 +20,13 @@ export function getScriptThatDefinesTheGlobal(params: { env: Record<string, unkn
             .replace(/"$/, "")};`,
         `  var env = {};`,
         `  Object.keys(envWithValuesInBase64).forEach(function (name) {`,
-        `    env[name] = new TextDecoder().decode(`,
-        `      Uint8Array.from(`,
-        `        atob(envWithValuesInBase64[name]),`,
-        `        c => c.charCodeAt(0))`,
+        `    env[name] = JSON.parse(`,
+        `      new TextDecoder().decode(`,
+        `        Uint8Array.from(`,
+        `          atob(envWithValuesInBase64[name]),`,
+        `          c => c.charCodeAt(0)`,
+        `        )`,
+        `      )`,
         `    );`,
         `  });`,
         `  window.${nameOfTheGlobal} = env;`,
