@@ -639,14 +639,21 @@ export function viteEnvs(params?: {
                     ``,
                     ...Object.entries(buildTimeMergedEnv)
                         .map(([name, value]) => {
-                            const valueB64 = Buffer.from(
-                                `${singularString2}${JSON.stringify(value)}\n`,
-                                "utf8"
-                            ).toString("base64");
+                            const [valueB64, valueB64_prefixed] = ([false, true] as const).map(
+                                doUsePrefix =>
+                                    Buffer.from(
+                                        `${
+                                            doUsePrefix
+                                                ? `${singularString2}${JSON.stringify(value)}`
+                                                : `${value}`
+                                        }\n`,
+                                        "utf8"
+                                    ).toString("base64")
+                            );
 
                             if (!(name in declaredEnv)) {
                                 return [
-                                    `${name}_base64="${valueB64}"`,
+                                    `${name}_base64="${valueB64_prefixed}"`,
                                     `${name}=$(echo "${valueB64}" | base64 -d)`
                                 ];
                             }
@@ -655,7 +662,7 @@ export function viteEnvs(params?: {
                                 `if printenv ${name} &> /dev/null; then`,
                                 `    ${name}_base64=$(printenv ${name} | base64)`,
                                 `else`,
-                                `    ${name}_base64="${valueB64}"`,
+                                `    ${name}_base64="${valueB64_prefixed}"`,
                                 `fi`,
                                 `${name}=\${${name}:-$(echo "${valueB64}" | base64 -d)}`
                             ];
