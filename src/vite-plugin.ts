@@ -154,6 +154,37 @@ export function viteEnvs(params?: {
                 "buildInfos": undefined
             };
 
+            dynamic_base_url: {
+                if (!("BASE_URL" in declaredEnv)) {
+                    break dynamic_base_url;
+                }
+
+                if (resolvedConfig.base !== "/") {
+                    console.warn(
+                        [
+                            "vite-envs: Since you're using a dynamic `BASE_URL`,",
+                            "you shouldn't use the `base` option in your vite.config.js.",
+                            `Ignoring \`base: "${resolvedConfig.base}"\`.`
+                        ].join(" ")
+                    );
+                }
+
+                const { mergedEnv } = getMergedEnv();
+
+                const BASE_URL_HIGHJACKED =
+                    resolvedConfig.command === "build" ? "./" : mergedEnv.BASE_URL;
+
+                Object.defineProperty(resolvedConfig, "base", {
+                    "value": BASE_URL_HIGHJACKED,
+                    "enumerable": true
+                });
+
+                Object.defineProperty(resolvedConfig.env, "BASE_URL", {
+                    "value": BASE_URL_HIGHJACKED,
+                    "enumerable": true
+                });
+            }
+
             {
                 const viteDirPath = (function callee(depth: number): string {
                     const cwd = pathResolve(pathJoin(...[appRootDirPath, ...Array(depth).fill("..")]));
@@ -639,14 +670,21 @@ export function viteEnvs(params?: {
                     ``,
                     ...Object.entries(buildTimeMergedEnv)
                         .map(([name, value]) => {
-                            const valueB64 = Buffer.from(
-                                `${singularString2}${JSON.stringify(value)}\n`,
-                                "utf8"
-                            ).toString("base64");
+                            const [valueB64, valueB64_prefixed] = ([false, true] as const).map(
+                                doUsePrefix =>
+                                    Buffer.from(
+                                        `${
+                                            doUsePrefix
+                                                ? `${singularString2}${JSON.stringify(value)}`
+                                                : `${value}`
+                                        }\n`,
+                                        "utf8"
+                                    ).toString("base64")
+                            );
 
                             if (!(name in declaredEnv)) {
                                 return [
-                                    `${name}_base64="${valueB64}"`,
+                                    `${name}_base64="${valueB64_prefixed}"`,
                                     `${name}=$(echo "${valueB64}" | base64 -d)`
                                 ];
                             }
@@ -655,7 +693,7 @@ export function viteEnvs(params?: {
                                 `if printenv ${name} &> /dev/null; then`,
                                 `    ${name}_base64=$(printenv ${name} | base64)`,
                                 `else`,
-                                `    ${name}_base64="${valueB64}"`,
+                                `    ${name}_base64="${valueB64_prefixed}"`,
                                 `fi`,
                                 `${name}=\${${name}:-$(echo "${valueB64}" | base64 -d)}`
                             ];
