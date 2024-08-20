@@ -44,6 +44,7 @@ More importantly, it allows you to ship a customizable Docker image of your weba
 -   😌 The `VITE_` prefix isn't required.  
 -   🛡️ Type-safe: Type definition for your `import.meta.env`. Hot reload enabled!
 -   🌐 `index.html`: Use your envs in your HTML file. Example `<title>%FOO%</title>`
+-   🚀 Dynamic `BASE_URL`: Don't know at compile time if your app will be at `domain.com/` or `domain.com/dashboard`? No problem!  
 -   📦 `import.meta.env` is an object, not a placeholder. `const { FOO } = import.meta.env;` works.
 -   🧠 [Supports computation of env values at build time](https://github.com/garronej/vite-envs-starter/blob/b0febf2d8ffa67dceaf140372445e3cb8059c2e1/vite.config.ts#L14-L37).  
 -   ⚙️ (Optional) enables to use EJS expressions in your `index.html`. `<title><%= import.meta.env.FOO.toUpperCase() =></title>`

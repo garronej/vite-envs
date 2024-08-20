@@ -5,7 +5,8 @@ import {
     resolve as pathResolve,
     basename as pathBasename,
     relative as pathRelative,
-    normalize as pathNormalize
+    normalize as pathNormalize,
+    dirname as pathDirname
 } from "path";
 import type { Plugin, ResolvedConfig } from "vite";
 import { assert } from "tsafe/assert";
@@ -50,6 +51,9 @@ export function viteEnvs(params?: {
     const getComputedEnv =
         typeof computedEnv_params === "function" ? computedEnv_params : () => computedEnv_params ?? {};
 
+    let declaredEnv: Record<string, string> | undefined = undefined;
+    let dotEnv: Record<string, string> | undefined = undefined;
+    let dotEnvLocal: Record<string, string> | undefined = undefined;
     let resultOfConfigResolved:
         | {
               appRootDirPath: string;
@@ -104,11 +108,38 @@ export function viteEnvs(params?: {
 
     const plugin = {
         "name": "vite-envs",
-        "configResolved": async resolvedConfig => {
-            const appRootDirPath = resolvedConfig.root;
-            const baseBuildTimeEnv: Record<string, unknown> = resolvedConfig.env;
+        "config": config => {
+            const appRootDirPath = (() => {
+                if (config.root !== undefined) {
+                    return getAbsoluteAndInOsFormatPath({
+                        "cwd": process.cwd(),
+                        "pathIsh": config.root
+                    });
+                }
 
-            const declaredEnv = (() => {
+                for (const arg of ["-c", "--config"]) {
+                    const index = process.argv.indexOf(arg);
+
+                    if (index === -1) {
+                        continue;
+                    }
+
+                    const pathIsh = process.argv[index + 1];
+
+                    assert(pathIsh !== undefined);
+
+                    return pathDirname(
+                        getAbsoluteAndInOsFormatPath({
+                            "cwd": process.cwd(),
+                            "pathIsh": pathIsh
+                        })
+                    );
+                }
+
+                return process.cwd();
+            })();
+
+            const declaredEnv_localCont = (() => {
                 const declarationEnvFilePath = getAbsoluteAndInOsFormatPath({
                     "cwd": appRootDirPath,
                     "pathIsh": declarationFile
@@ -127,19 +158,60 @@ export function viteEnvs(params?: {
                 return parsed;
             })();
 
-            const [dotEnv, dotEnvLocal] = [".env", ".env.local"].map(fileBasename => {
-                const filePath = pathJoin(appRootDirPath, fileBasename);
+            declaredEnv = declaredEnv_localCont;
 
-                if (!fs.existsSync(filePath)) {
-                    return {};
+            {
+                const [dotEnv_localConst, dotEnvLocal_localConst] = [".env", ".env.local"].map(
+                    fileBasename => {
+                        const filePath = pathJoin(appRootDirPath, fileBasename);
+
+                        if (!fs.existsSync(filePath)) {
+                            return {};
+                        }
+
+                        const parsed = parseDotEnv({
+                            "path": filePath
+                        });
+
+                        return Object.fromEntries(
+                            Object.entries(parsed).filter(([key]) => key in declaredEnv_localCont)
+                        );
+                    }
+                );
+
+                dotEnv = dotEnv_localConst;
+                dotEnvLocal = dotEnvLocal_localConst;
+            }
+
+            dynamic_base_url: {
+                if (!("BASE_URL" in declaredEnv)) {
+                    break dynamic_base_url;
                 }
 
-                const parsed = parseDotEnv({
-                    "path": filePath
-                });
+                if (config.base !== undefined) {
+                    console.warn(
+                        [
+                            "WARNING: vite-envs: Since you're using a dynamic `BASE_URL`,",
+                            "you shouldn't use the `base` option in your vite.config.js.",
+                            `Ignoring \`base: "${config.base}"\`.`
+                        ].join(" ")
+                    );
+                }
 
-                return Object.fromEntries(Object.entries(parsed).filter(([key]) => key in declaredEnv));
-            });
+                config.base = process.env.BASE_URL ?? dotEnvLocal.BASE_URL ?? dotEnv.BASE_URL;
+
+                assert(config.base !== undefined);
+            }
+
+            return config;
+        },
+        "configResolved": async resolvedConfig => {
+            const appRootDirPath = resolvedConfig.root;
+            const baseBuildTimeEnv: Record<string, unknown> = resolvedConfig.env;
+
+            assert(declaredEnv !== undefined);
+            assert(dotEnvLocal !== undefined);
+            assert(dotEnv !== undefined);
 
             const computedEnv = await getComputedEnv({ resolvedConfig, declaredEnv, dotEnvLocal });
 
@@ -153,6 +225,29 @@ export function viteEnvs(params?: {
                 "shouldGenerateSourcemap": resolvedConfig.build.sourcemap !== false,
                 "buildInfos": undefined
             };
+
+            dynamic_base_url: {
+                if (resolvedConfig.command !== "build") {
+                    break dynamic_base_url;
+                }
+
+                if (!("BASE_URL" in declaredEnv)) {
+                    break dynamic_base_url;
+                }
+
+                const attributes = {
+                    "value": "./",
+                    "enumerable": true
+                };
+
+                (
+                    [
+                        [resolvedConfig, "base"],
+                        [resolvedConfig.env, "BASE_URL"],
+                        [resolvedConfig, "rawBase"]
+                    ] as const
+                ).forEach(([o, p]) => Object.defineProperty(o, p, attributes));
+            }
 
             {
                 const viteDirPath = (function callee(depth: number): string {
