@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import { nameOfTheGlobal } from "./constants";
 import { join as pathJoin } from "path";
+import { assert } from "tsafe/assert";
+import { is } from "tsafe/is";
 
 type Params = {
     distDirPath: string;
@@ -41,5 +43,19 @@ export function createSwEnvJsFile(params: Params) {
         `self.${nameOfTheGlobal} = env;`
     ].join("\n");
 
-    fs.writeFileSync(pathJoin(distDirPath, "swEnv.js"), Buffer.from(swEnv, "utf8"));
+    try {
+        fs.writeFileSync(pathJoin(distDirPath, "swEnv.js"), Buffer.from(swEnv, "utf8"));
+    } catch (error) {
+        assert(is<Error>(error));
+
+        // Test if permission error
+
+        if (!error.message.includes("permission denied")) {
+            throw error;
+        }
+
+        console.log(
+            "Not enough permissions to update the swEnv.js file. It's not an issue if you don't explicitly use it"
+        );
+    }
 }

@@ -728,7 +728,7 @@ export function viteEnvs(params?: {
                     `self.${nameOfTheGlobal} = env;`,
                     `"`,
                     ``,
-                    `echo "$swEnv_script" > "$DIR/swEnv.js"`,
+                    `echo "$swEnv_script" > "$DIR/swEnv.js" || echo "Not enough permissions to write to $DIR/swEnv.js"`,
                     ``
                 ].join("\n");
 
