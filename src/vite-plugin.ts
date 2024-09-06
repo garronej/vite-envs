@@ -22,7 +22,7 @@ import { exclude } from "tsafe/exclude";
 import { getAbsoluteAndInOsFormatPath } from "./tools/getAbsoluteAndInOsFormatPath";
 import MagicString from "magic-string";
 import { createSwEnvJsFile } from "./createSwEnvJsFile";
-import { parseDotEnv } from "./parseDotEnv";
+import { parseDotEnv, parseEnvValue } from "./parseDotEnv";
 
 export function viteEnvs(params?: {
     computedEnv?:
@@ -96,6 +96,7 @@ export function viteEnvs(params?: {
                     .map(([key, value]) => (value === undefined ? undefined : ([key, value] as const)))
                     .filter(exclude(undefined))
                     .filter(([key]) => key in declaredEnv)
+                    .map(([key, value]) => [key, parseEnvValue(value)])
             )
         };
 
