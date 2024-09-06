@@ -409,7 +409,7 @@ export function viteEnvs(params?: {
                 /import\.meta\.env(?:\.([A-Za-z0-9$_]+)|\["([^"]+)"\]|(.?))/g,
                 (match, p1, p2, p3) => {
                     const out = (() => {
-                        const globalRef = `window.${nameOfTheGlobal}`;
+                        const globalRef = `globalThis.${nameOfTheGlobal}`;
 
                         if (p3 !== undefined) {
                             return `${globalRef}${p3}`;
@@ -714,7 +714,7 @@ export function viteEnvs(params?: {
                     `        ).slice(0,-1);`,
                     `        env[name] = value.startsWith(\\"${singularString2}\\") ? JSON.parse(value.slice(\\"${singularString2}\\".length)) : value;`,
                     `      });`,
-                    `      window.${nameOfTheGlobal} = env;`,
+                    `      globalThis.${nameOfTheGlobal} = env;`,
                     `    </script>"`,
                     ``,
                     `scriptPlaceholder="${placeholderForViteEnvsScript}"`,
