@@ -383,8 +383,9 @@ export function viteEnvs(params?: {
             {
                 const isJavascriptFile = filePath.endsWith(".js") || filePath.endsWith(".jsx");
                 const isTypeScriptFile = filePath.endsWith(".ts") || filePath.endsWith(".tsx");
+                const isVue = filePath.endsWith(".vue");
 
-                if (!isTypeScriptFile && !isJavascriptFile) {
+                if (!isTypeScriptFile && !isJavascriptFile && !isVue) {
                     return;
                 }
             }
