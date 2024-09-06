@@ -74,7 +74,7 @@ export function viteEnvs(params?: {
     const getMergedEnv = () => {
         assert(resultOfConfigResolved !== undefined);
 
-        const { baseBuildTimeEnv, declaredEnv, dotEnv, dotEnvLocal, computedEnv } =
+        const { baseBuildTimeEnv, declaredEnv, dotEnv, dotEnvLocal, computedEnv, appRootDirPath } =
             resultOfConfigResolved;
 
         const mergedEnv = {
@@ -89,7 +89,16 @@ export function viteEnvs(params?: {
                     ([key, value]) => !(key in computedEnv && value === "")
                 )
             ),
-            ...(declarationFile === ".env" ? undefined : dotEnv),
+            ...(getAbsoluteAndInOsFormatPath({
+                "cwd": appRootDirPath,
+                "pathIsh": declarationFile
+            }) ===
+            getAbsoluteAndInOsFormatPath({
+                "cwd": appRootDirPath,
+                "pathIsh": ".env"
+            })
+                ? undefined
+                : dotEnv),
             ...dotEnvLocal,
             ...Object.fromEntries(
                 Object.entries(process.env)
