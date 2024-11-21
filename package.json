@@ -67,11 +67,11 @@
         "dotenv": "^16.4.4",
         "ejs": "^3.1.9",
         "magic-string": "^0.30.7",
-        "tsafe": "^1.7.2",
+        "tsafe": "^1.8.5",
         "chokidar": "^3.6.0",
-        "powerhooks": "^1.0.13",
+        "powerhooks": "^1.0.19",
         "@vercel/ncc": "^0.38.1",
-        "evt": "^2.5.7",
+        "evt": "^2.5.8",
         "run-exclusive": "^2.2.19"
     }
 }

@@ -1,8 +1,7 @@
 import * as fs from "fs";
 import { nameOfTheGlobal } from "./constants";
 import { join as pathJoin } from "path";
-import { assert } from "tsafe/assert";
-import { is } from "tsafe/is";
+import { assert, is } from "tsafe";
 
 type Params = {
     distDirPath: string;
