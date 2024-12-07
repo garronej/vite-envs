@@ -6,7 +6,7 @@ export function updateTypes() {
         "env": {
             ...process.env,
             [updateTypingScriptEnvName]: ""
-        }
+        },
+        "stdio": "inherit"
     });
-    console.log(`src/vite-env.d.ts has been updated`);
 }

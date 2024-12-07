@@ -365,6 +365,7 @@ export function viteEnvs(params?: {
                 }
 
                 if (isUpdateTypesScriptRun) {
+                    console.log(`src/vite-env.d.ts has been updated`);
                     process.exit(0);
                 }
             }
