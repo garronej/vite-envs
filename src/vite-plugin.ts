@@ -207,8 +207,23 @@ export function viteEnvs(params?: {
                     }
                 });
 
+                const isUpdateTypesScriptRun = updateTypingScriptEnvName in process.env;
+
                 {
-                    const dTsFilePath = pathJoin(appRootDirPath, "src", "vite-env.d.ts");
+                    const srcDirPath = pathJoin(appRootDirPath, "src");
+
+                    if (!fs.existsSync(srcDirPath)) {
+                        if (isUpdateTypesScriptRun) {
+                            console.log(
+                                `${srcDirPath} directory does not exist. Assuming that we are installing dependencies in Docker, skipping`
+                            );
+                            process.exit(0);
+                        }
+
+                        throw new Error(`The directory ${srcDirPath} does not exist.`);
+                    }
+
+                    const dTsFilePath = pathJoin(srcDirPath, "vite-env.d.ts");
 
                     let dTsFileContent = !fs.existsSync(dTsFilePath)
                         ? `/// <reference types="vite/client" />\n`
@@ -342,7 +357,7 @@ export function viteEnvs(params?: {
                     fs.writeFileSync(dTsFilePath, Buffer.from(dTsFileContent, "utf8"));
                 }
 
-                if (updateTypingScriptEnvName in process.env) {
+                if (isUpdateTypesScriptRun) {
                     process.exit(0);
                 }
             }
