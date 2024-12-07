@@ -118,6 +118,8 @@ export function viteEnvs(params?: {
             const appRootDirPath = resolvedConfig.root;
             const baseBuildTimeEnv: Record<string, unknown> = resolvedConfig.env;
 
+            const isUpdateTypesScriptRun = updateTypingScriptEnvName in process.env;
+
             const declaredEnv = (() => {
                 const declarationEnvFilePath = getAbsoluteAndInOsFormatPath({
                     "cwd": appRootDirPath,
@@ -125,6 +127,13 @@ export function viteEnvs(params?: {
                 });
 
                 if (!fs.existsSync(declarationEnvFilePath)) {
+                    if (isUpdateTypesScriptRun) {
+                        console.log(
+                            `The file ${declarationEnvFilePath} does not exist. Skipping the update of the types.`
+                        );
+                        process.exit(0);
+                    }
+
                     throw new Error(
                         `There is no ${pathRelative(appRootDirPath, declarationEnvFilePath)}`
                     );
@@ -207,15 +216,13 @@ export function viteEnvs(params?: {
                     }
                 });
 
-                const isUpdateTypesScriptRun = updateTypingScriptEnvName in process.env;
-
                 {
                     const srcDirPath = pathJoin(appRootDirPath, "src");
 
                     if (!fs.existsSync(srcDirPath)) {
                         if (isUpdateTypesScriptRun) {
                             console.log(
-                                `${srcDirPath} directory does not exist. Assuming that we are installing dependencies in Docker, skipping`
+                                `${srcDirPath} directory does not exist. Skipping the update of the types.`
                             );
                             process.exit(0);
                         }
