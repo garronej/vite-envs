@@ -540,6 +540,11 @@ export function viteEnvs(params?: {
 
                 const { assetsUrlPath, distDirPath } = buildInfos;
 
+                if (!fs.existsSync(distDirPath)) {
+                    // There was an error in the build
+                    return;
+                }
+
                 const viteEnvsMeta: ViteEnvsMeta = {
                     "version": JSON.parse(
                         fs
@@ -573,6 +578,11 @@ export function viteEnvs(params?: {
                 }
 
                 const { distDirPath } = buildInfos;
+
+                if (!fs.existsSync(distDirPath)) {
+                    // There was an error in the build
+                    return;
+                }
 
                 const indexHtmlFilePath = pathJoin(distDirPath, "index.html");
 
