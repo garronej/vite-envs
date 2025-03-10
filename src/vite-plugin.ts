@@ -40,12 +40,30 @@ export function viteEnvs(params?: {
      * See documentation for more information.
      */
     indexAsEjs?: boolean;
+
+    /**
+     * Default: ({ appRootDirPath }) => pathJoin(appRootDirPath, "src", "vite-env.d.ts")
+     */
+    ambientModuleDeclarationFilePath?: string | ((params: { appRootDirPath: string }) => string);
 }) {
     const {
         computedEnv: computedEnv_params,
         declarationFile = ".env",
-        indexAsEjs = false
+        indexAsEjs = false,
+        ambientModuleDeclarationFilePath: ambientModuleDeclarationFilePath_params
     } = params ?? {};
+
+    const getAmbientModuleDeclarationFilePath: (params: { appRootDirPath: string }) => string = (() => {
+        if (ambientModuleDeclarationFilePath_params === undefined) {
+            return ({ appRootDirPath }) => pathJoin(appRootDirPath, "src", "vite-env.d.ts");
+        }
+
+        if (typeof ambientModuleDeclarationFilePath_params === "string") {
+            return () => ambientModuleDeclarationFilePath_params;
+        }
+
+        return ambientModuleDeclarationFilePath_params;
+    })();
 
     const getComputedEnv =
         typeof computedEnv_params === "function" ? computedEnv_params : () => computedEnv_params ?? {};
@@ -208,11 +226,13 @@ export function viteEnvs(params?: {
                 });
 
                 {
-                    const dTsFilePath = pathJoin(appRootDirPath, "src", "vite-env.d.ts");
+                    const ambientModuleDeclarationFilePath = getAmbientModuleDeclarationFilePath({
+                        appRootDirPath
+                    });
 
-                    let dTsFileContent = !fs.existsSync(dTsFilePath)
+                    let dTsFileContent = !fs.existsSync(ambientModuleDeclarationFilePath)
                         ? `/// <reference types="vite/client" />\n`
-                        : fs.readFileSync(dTsFilePath).toString("utf8");
+                        : fs.readFileSync(ambientModuleDeclarationFilePath).toString("utf8");
 
                     dTsFileContent = dTsFileContent.replace(
                         /^\s*\/\/\/\s*<reference\s+types=["']vite\/client["']\s*\/>\s*\r?\n?/,
@@ -339,7 +359,10 @@ export function viteEnvs(params?: {
                         }
                     }
 
-                    fs.writeFileSync(dTsFilePath, Buffer.from(dTsFileContent, "utf8"));
+                    fs.writeFileSync(
+                        ambientModuleDeclarationFilePath,
+                        Buffer.from(dTsFileContent, "utf8")
+                    );
                 }
 
                 if (updateTypingScriptEnvName in process.env) {

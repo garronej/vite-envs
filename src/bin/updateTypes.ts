@@ -33,6 +33,4 @@ export async function updateTypes(): Promise<void> {
             resolve();
         });
     });
-
-    console.log(`src/vite-env.d.ts has been updated`);
 }
