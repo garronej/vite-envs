@@ -1,7 +1,10 @@
-import { nameOfTheGlobal } from "./constants";
+import { defaultNameOfTheGlobal } from "./constants";
 
-export function getScriptThatDefinesTheGlobal(params: { env: Record<string, unknown> }): string {
-    const { env } = params;
+export function getScriptThatDefinesTheGlobal(params: {
+    env: Record<string, unknown>;
+    nameOfTheGlobal?: string;
+}): string {
+    const { env, nameOfTheGlobal } = params;
 
     const scriptPropertyKey = "data-script-description";
     const scriptPropertyValue = "Environment variables injected by vite-envs";
@@ -29,7 +32,7 @@ export function getScriptThatDefinesTheGlobal(params: { env: Record<string, unkn
         `      )`,
         `    );`,
         `  });`,
-        `  window.${nameOfTheGlobal} = env;`,
+        `  window.${nameOfTheGlobal ?? defaultNameOfTheGlobal} = env;`,
         `</script>`
     ].join("\n");
 
