@@ -1,8 +1,6 @@
-import { defaultNameOfTheGlobal } from "./constants";
-
 export function getScriptThatDefinesTheGlobal(params: {
     env: Record<string, unknown>;
-    nameOfTheGlobal?: string;
+    nameOfTheGlobal: string;
 }): string {
     const { env, nameOfTheGlobal } = params;
 
@@ -32,7 +30,7 @@ export function getScriptThatDefinesTheGlobal(params: {
         `      )`,
         `    );`,
         `  });`,
-        `  window.${nameOfTheGlobal ?? defaultNameOfTheGlobal} = env;`,
+        `  window.${nameOfTheGlobal} = env;`,
         `</script>`
     ].join("\n");
 

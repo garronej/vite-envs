@@ -11,11 +11,7 @@ import type { Plugin, ResolvedConfig } from "vite";
 import { assert } from "tsafe/assert";
 import { getThisCodebaseRootDirPath } from "./tools/getThisCodebaseRootDirPath";
 import * as fs from "fs";
-import {
-    defaultNameOfTheGlobal,
-    viteEnvsMetaFileBasename,
-    updateTypingScriptEnvName
-} from "./constants";
+import { viteEnvsMetaFileBasename, updateTypingScriptEnvName } from "./constants";
 import { getScriptThatDefinesTheGlobal } from "./getScriptThatDefinesTheGlobal";
 import { injectInHeadBeforeFirstScriptTag } from "./injectInHeadBeforeFirstScriptTag";
 import { renderHtmlAsEjs } from "./renderHtmlAsEjs";
@@ -62,7 +58,7 @@ export function viteEnvs(params?: {
         declarationFile = ".env",
         indexAsEjs = false,
         ambientModuleDeclarationFilePath: ambientModuleDeclarationFilePath_params,
-        nameOfTheGlobal
+        nameOfTheGlobal = "__VITE_ENVS"
     } = params ?? {};
 
     const getAmbientModuleDeclarationFilePath: (params: { appRootDirPath: string }) => string = (() => {
@@ -444,7 +440,7 @@ export function viteEnvs(params?: {
                 /import\.meta\.env(?:\.([A-Za-z0-9$_]+)|\["([^"]+)"\]|(.?))/g,
                 (match, p1, p2, p3) => {
                     const out = (() => {
-                        const globalRef = `window.${nameOfTheGlobal ?? defaultNameOfTheGlobal}`;
+                        const globalRef = `window.${nameOfTheGlobal}`;
 
                         if (p3 !== undefined) {
                             return `${globalRef}${p3}`;
@@ -596,7 +592,8 @@ export function viteEnvs(params?: {
                     declaredEnv,
                     computedEnv,
                     baseBuildTimeEnv,
-                    htmlPre
+                    htmlPre,
+                    nameOfTheGlobal
                 };
 
                 fs.writeFileSync(
@@ -766,7 +763,7 @@ export function viteEnvs(params?: {
                     `        ).slice(0,-1);`,
                     `        env[name] = value.startsWith(\\"${singularString2}\\") ? JSON.parse(value.slice(\\"${singularString2}\\".length)) : value;`,
                     `      });`,
-                    `      window.${nameOfTheGlobal ?? defaultNameOfTheGlobal} = env;`,
+                    `      window.${nameOfTheGlobal} = env;`,
                     `    </script>"`,
                     ``,
                     `scriptPlaceholder="${placeholderForViteEnvsScript}"`,
@@ -788,7 +785,7 @@ export function viteEnvs(params?: {
                     `  ).slice(0,-1);`,
                     `  env[name] = value.startsWith(\\"${singularString2}\\") ? JSON.parse(value.slice(\\"${singularString2}\\".length)) : value;`,
                     `});`,
-                    `self.${nameOfTheGlobal ?? defaultNameOfTheGlobal} = env;`,
+                    `self.${nameOfTheGlobal} = env;`,
                     `"`,
                     ``,
                     `echo "$swEnv_script" > "$DIR/swEnv.js" || echo "Not enough permissions to write to $DIR/swEnv.js"`,
