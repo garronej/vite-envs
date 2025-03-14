@@ -11,7 +11,11 @@ import type { Plugin, ResolvedConfig } from "vite";
 import { assert } from "tsafe/assert";
 import { getThisCodebaseRootDirPath } from "./tools/getThisCodebaseRootDirPath";
 import * as fs from "fs";
-import { nameOfTheGlobal, viteEnvsMetaFileBasename, updateTypingScriptEnvName } from "./constants";
+import {
+    defaultNameOfTheGlobal,
+    viteEnvsMetaFileBasename,
+    updateTypingScriptEnvName
+} from "./constants";
 import { getScriptThatDefinesTheGlobal } from "./getScriptThatDefinesTheGlobal";
 import { injectInHeadBeforeFirstScriptTag } from "./injectInHeadBeforeFirstScriptTag";
 import { renderHtmlAsEjs } from "./renderHtmlAsEjs";
@@ -45,12 +49,20 @@ export function viteEnvs(params?: {
      * Default: ({ appRootDirPath }) => pathJoin(appRootDirPath, "src", "vite-env.d.ts")
      */
     ambientModuleDeclarationFilePath?: string | ((params: { appRootDirPath: string }) => string);
+
+    /**
+     * Default: "__VITE_ENVS"
+     * Provide this value if you want to change name of the global var (in MFE context for example).
+     * Should not be a key of window or self object, best practice is using "__" as prefix.
+     */
+    nameOfTheGlobal?: string;
 }) {
     const {
         computedEnv: computedEnv_params,
         declarationFile = ".env",
         indexAsEjs = false,
-        ambientModuleDeclarationFilePath: ambientModuleDeclarationFilePath_params
+        ambientModuleDeclarationFilePath: ambientModuleDeclarationFilePath_params,
+        nameOfTheGlobal
     } = params ?? {};
 
     const getAmbientModuleDeclarationFilePath: (params: { appRootDirPath: string }) => string = (() => {
@@ -432,7 +444,7 @@ export function viteEnvs(params?: {
                 /import\.meta\.env(?:\.([A-Za-z0-9$_]+)|\["([^"]+)"\]|(.?))/g,
                 (match, p1, p2, p3) => {
                     const out = (() => {
-                        const globalRef = `window.${nameOfTheGlobal}`;
+                        const globalRef = `window.${nameOfTheGlobal ?? defaultNameOfTheGlobal}`;
 
                         if (p3 !== undefined) {
                             return `${globalRef}${p3}`;
@@ -504,7 +516,10 @@ export function viteEnvs(params?: {
 
                     processedHtml = injectInHeadBeforeFirstScriptTag({
                         "html": processedHtml,
-                        "htmlToInject": getScriptThatDefinesTheGlobal({ "env": mergedEnv })
+                        "htmlToInject": getScriptThatDefinesTheGlobal({
+                            "env": mergedEnv,
+                            nameOfTheGlobal
+                        })
                     });
 
                     return processedHtml;
@@ -536,7 +551,10 @@ export function viteEnvs(params?: {
 
                         processedHtml = injectInHeadBeforeFirstScriptTag({
                             "html": processedHtml,
-                            "htmlToInject": getScriptThatDefinesTheGlobal({ "env": mergedEnv })
+                            "htmlToInject": getScriptThatDefinesTheGlobal({
+                                "env": mergedEnv,
+                                nameOfTheGlobal
+                            })
                         });
 
                         return processedHtml;
@@ -588,7 +606,7 @@ export function viteEnvs(params?: {
 
                 const { mergedEnv } = getMergedEnv();
 
-                createSwEnvJsFile({ distDirPath, mergedEnv });
+                createSwEnvJsFile({ distDirPath, mergedEnv, nameOfTheGlobal });
             };
             const closeBundle_noEjs = () => {
                 assert(resultOfConfigResolved !== undefined);
@@ -628,13 +646,14 @@ export function viteEnvs(params?: {
                     processedHtml = injectInHeadBeforeFirstScriptTag({
                         "html": processedHtml,
                         "htmlToInject": getScriptThatDefinesTheGlobal({
-                            "env": mergedEnv
+                            "env": mergedEnv,
+                            nameOfTheGlobal
                         })
                     });
 
                     fs.writeFileSync(indexHtmlFilePath, Buffer.from(processedHtml, "utf8"));
 
-                    createSwEnvJsFile({ distDirPath, mergedEnv });
+                    createSwEnvJsFile({ distDirPath, mergedEnv, nameOfTheGlobal });
                 })(processedHtml);
 
                 const placeholderForViteEnvsScript = `<!-- vite-envs script placeholder xKsPmLs30swKsdIsVx -->`;
@@ -747,7 +766,7 @@ export function viteEnvs(params?: {
                     `        ).slice(0,-1);`,
                     `        env[name] = value.startsWith(\\"${singularString2}\\") ? JSON.parse(value.slice(\\"${singularString2}\\".length)) : value;`,
                     `      });`,
-                    `      window.${nameOfTheGlobal} = env;`,
+                    `      window.${nameOfTheGlobal ?? defaultNameOfTheGlobal} = env;`,
                     `    </script>"`,
                     ``,
                     `scriptPlaceholder="${placeholderForViteEnvsScript}"`,
@@ -769,7 +788,7 @@ export function viteEnvs(params?: {
                     `  ).slice(0,-1);`,
                     `  env[name] = value.startsWith(\\"${singularString2}\\") ? JSON.parse(value.slice(\\"${singularString2}\\".length)) : value;`,
                     `});`,
-                    `self.${nameOfTheGlobal} = env;`,
+                    `self.${nameOfTheGlobal ?? defaultNameOfTheGlobal} = env;`,
                     `"`,
                     ``,
                     `echo "$swEnv_script" > "$DIR/swEnv.js" || echo "Not enough permissions to write to $DIR/swEnv.js"`,

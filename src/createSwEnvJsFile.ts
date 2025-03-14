@@ -1,15 +1,16 @@
 import * as fs from "fs";
-import { nameOfTheGlobal } from "./constants";
+import { defaultNameOfTheGlobal } from "./constants";
 import { join as pathJoin } from "path";
 import { assert, is } from "tsafe";
 
 type Params = {
     distDirPath: string;
     mergedEnv: Record<string, unknown>;
+    nameOfTheGlobal?: string;
 };
 
 export function createSwEnvJsFile(params: Params) {
-    const { distDirPath, mergedEnv } = params;
+    const { distDirPath, mergedEnv, nameOfTheGlobal } = params;
 
     const envWithValuesInBase64 = Object.fromEntries(
         Object.entries(mergedEnv).map(([key, value]) => [
@@ -23,7 +24,9 @@ export function createSwEnvJsFile(params: Params) {
         `// It enables you to access environment variables in your service worker.`,
         `// To use it, use \`importScripts("swEnv.js")\` at the top of your worker file.`,
         `// (Assuming your worker file is next to this file)`,
-        `// Then you can access your environment variables via \`self.${nameOfTheGlobal}.MY_VAR\``,
+        `// Then you can access your environment variables via \`self.${
+            nameOfTheGlobal ?? defaultNameOfTheGlobal
+        }.MY_VAR\``,
         ``,
         `const envWithValuesInBase64 = ${JSON.stringify(envWithValuesInBase64, null, 2)
             .replace(/^"/, "")
@@ -39,7 +42,7 @@ export function createSwEnvJsFile(params: Params) {
         `      )`,
         `    );`,
         `});`,
-        `self.${nameOfTheGlobal} = env;`
+        `self.${nameOfTheGlobal ?? defaultNameOfTheGlobal} = env;`
     ].join("\n");
 
     try {

@@ -11,8 +11,16 @@ import { exclude } from "tsafe/exclude";
 import { createSwEnvJsFile } from "../createSwEnvJsFile";
 
 export async function postBuildInjectionScript() {
-    const { assetsUrlPath, baseBuildTimeEnv, declaredEnv, computedEnv, htmlPre }: ViteEnvsMeta =
-        JSON.parse(fs.readFileSync(pathJoin(process.cwd(), viteEnvsMetaFileBasename)).toString("utf8"));
+    const {
+        assetsUrlPath,
+        baseBuildTimeEnv,
+        declaredEnv,
+        computedEnv,
+        htmlPre,
+        nameOfTheGlobal
+    }: ViteEnvsMeta = JSON.parse(
+        fs.readFileSync(pathJoin(process.cwd(), viteEnvsMetaFileBasename)).toString("utf8")
+    );
 
     const mergedEnv = {
         ...Object.fromEntries(
@@ -61,10 +69,10 @@ export async function postBuildInjectionScript() {
 
     processedHtml = injectInHeadBeforeFirstScriptTag({
         "html": processedHtml,
-        "htmlToInject": getScriptThatDefinesTheGlobal({ "env": mergedEnv })
+        "htmlToInject": getScriptThatDefinesTheGlobal({ "env": mergedEnv, nameOfTheGlobal })
     });
 
     fs.writeFileSync(indexHtmlFilePath, Buffer.from(processedHtml, "utf8"));
 
-    createSwEnvJsFile({ "distDirPath": cwd, mergedEnv });
+    createSwEnvJsFile({ "distDirPath": cwd, mergedEnv, nameOfTheGlobal });
 }
