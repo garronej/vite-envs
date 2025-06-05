@@ -16,21 +16,23 @@ export function getScriptThatDefinesTheGlobal(params: {
 
     const scriptThatDefinesTheGlobal = [
         `<script ${scriptPropertyKey}="${scriptPropertyValue}">`,
-        `  var envWithValuesInBase64 = ${JSON.stringify(envWithValuesInBase64, null, 2)
+        `  (function (){`,
+        `    var envWithValuesInBase64 = ${JSON.stringify(envWithValuesInBase64, null, 2)
             .replace(/^"/, "")
             .replace(/"$/, "")};`,
-        `  var env = {};`,
-        `  Object.keys(envWithValuesInBase64).forEach(function (name) {`,
-        `    env[name] = JSON.parse(`,
-        `      new TextDecoder().decode(`,
-        `        Uint8Array.from(`,
-        `          atob(envWithValuesInBase64[name]),`,
-        `          c => c.charCodeAt(0)`,
+        `    var env = {};`,
+        `    Object.keys(envWithValuesInBase64).forEach(function (name) {`,
+        `      env[name] = JSON.parse(`,
+        `        new TextDecoder().decode(`,
+        `          Uint8Array.from(`,
+        `            atob(envWithValuesInBase64[name]),`,
+        `            c => c.charCodeAt(0)`,
+        `          )`,
         `        )`,
-        `      )`,
-        `    );`,
-        `  });`,
-        `  window.${nameOfTheGlobal} = env;`,
+        `      );`,
+        `    });`,
+        `    window.${nameOfTheGlobal} = env;`,
+        `  })();`,
         `</script>`
     ].join("\n");
 
