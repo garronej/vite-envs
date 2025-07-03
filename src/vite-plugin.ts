@@ -631,6 +631,20 @@ export function viteEnvs(params?: {
                     (_, key) => `%${key}%`
                 );
 
+                // NOTE: We can't use cheerio because not a valid HTML document.
+                const injectInHeadBeforeFirstScriptTag = (params: {
+                    html: string;
+                    htmlToInject: string;
+                }) => {
+                    const { html, htmlToInject } = params;
+
+                    const sep = "<script ";
+
+                    const [p1, ...rest] = html.split(sep);
+
+                    return [p1 + htmlToInject, ...rest].join(sep);
+                };
+
                 // NOTE: Make is so running the ./vite-envs.sh script is optional.
                 ((processedHtml: string) => {
                     const { mergedEnv } = getMergedEnv();
