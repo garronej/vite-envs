@@ -84,6 +84,8 @@ export function viteEnvs(params?: {
               computedEnv: Record<string, unknown>;
               dotEnv: Record<string, string>;
               dotEnvLocal: Record<string, string>;
+              dotEnvMode: Record<string, string>;
+              dotEnvModeLocal: Record<string, string>;
               shouldGenerateSourcemap: boolean;
               buildInfos:
                   | {
@@ -100,8 +102,16 @@ export function viteEnvs(params?: {
     const getMergedEnv = () => {
         assert(resultOfConfigResolved !== undefined);
 
-        const { baseBuildTimeEnv, declaredEnv, dotEnv, dotEnvLocal, computedEnv, appRootDirPath } =
-            resultOfConfigResolved;
+        const {
+            baseBuildTimeEnv,
+            declaredEnv,
+            dotEnv,
+            dotEnvLocal,
+            dotEnvMode,
+            dotEnvModeLocal,
+            computedEnv,
+            appRootDirPath
+        } = resultOfConfigResolved;
 
         const mergedEnv = {
             ...Object.fromEntries(
@@ -115,6 +125,7 @@ export function viteEnvs(params?: {
                     ([key, value]) => !(key in computedEnv && value === "")
                 )
             ),
+            // Apply Vite env file priority order: .env < .env.local < .env.[mode] < .env.[mode].local
             ...(getAbsoluteAndInOsFormatPath({
                 "cwd": appRootDirPath,
                 "pathIsh": declarationFile
@@ -126,6 +137,8 @@ export function viteEnvs(params?: {
                 ? undefined
                 : dotEnv),
             ...dotEnvLocal,
+            ...dotEnvMode,
+            ...dotEnvModeLocal,
             ...Object.fromEntries(
                 Object.entries(process.env)
                     .map(([key, value]) => (value === undefined ? undefined : ([key, value] as const)))
@@ -163,7 +176,11 @@ export function viteEnvs(params?: {
                 return parsed;
             })();
 
-            const [dotEnv, dotEnvLocal] = [".env", ".env.local"].map(fileBasename => {
+            // Load environment files in the correct Vite priority order
+            const mode = resolvedConfig.mode;
+            const envFiles = [".env", ".env.local", `.env.${mode}`, `.env.${mode}.local`];
+
+            const [dotEnv, dotEnvLocal, dotEnvMode, dotEnvModeLocal] = envFiles.map(fileBasename => {
                 const filePath = pathJoin(appRootDirPath, fileBasename);
 
                 if (!fs.existsSync(filePath)) {
@@ -177,7 +194,19 @@ export function viteEnvs(params?: {
                 return Object.fromEntries(Object.entries(parsed).filter(([key]) => key in declaredEnv));
             });
 
-            const computedEnv = await getComputedEnv({ resolvedConfig, declaredEnv, dotEnvLocal });
+            // Merge environment files in correct priority order for computedEnv
+            const mergedDotEnv = {
+                ...dotEnv,
+                ...dotEnvLocal,
+                ...dotEnvMode,
+                ...dotEnvModeLocal
+            };
+
+            const computedEnv = await getComputedEnv({
+                resolvedConfig,
+                declaredEnv,
+                dotEnvLocal: mergedDotEnv
+            });
 
             resultOfConfigResolved = {
                 appRootDirPath,
@@ -186,6 +215,8 @@ export function viteEnvs(params?: {
                 computedEnv,
                 dotEnv,
                 dotEnvLocal,
+                dotEnvMode,
+                dotEnvModeLocal,
                 "shouldGenerateSourcemap": resolvedConfig.build.sourcemap !== false,
                 "buildInfos": undefined
             };
