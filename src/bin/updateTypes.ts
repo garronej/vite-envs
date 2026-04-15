@@ -2,9 +2,8 @@ import * as child_process from "child_process";
 import { updateTypingScriptEnvName } from "../constants";
 
 export async function updateTypes(): Promise<void> {
+    const isWindows = process.platform === "win32";
 
-    const isWindows = process.platform === "win32";                                                                                                                                                          
-    
     const child = child_process.spawn("npx", ["vite", "dev"], {
         env: {
             ...process.env,
