@@ -7,7 +7,7 @@ import {
     relative as pathRelative,
     normalize as pathNormalize
 } from "path";
-import type { Plugin, ResolvedConfig } from "vite";
+import type { Plugin, ResolvedConfig } from "vite" assert { "resolution-mode": "import" };
 import { assert } from "tsafe/assert";
 import { getThisCodebaseRootDirPath } from "./tools/getThisCodebaseRootDirPath";
 import * as fs from "fs";
