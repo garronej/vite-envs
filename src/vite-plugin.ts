@@ -9,6 +9,7 @@ import {
 } from "path";
 import type { Plugin, ResolvedConfig } from "vite" assert { "resolution-mode": "import" };
 import { assert } from "tsafe/assert";
+import { typeGuard } from "tsafe/typeGuard";
 import { getThisCodebaseRootDirPath } from "./tools/getThisCodebaseRootDirPath";
 import * as fs from "fs";
 import { viteEnvsMetaFileBasename, updateTypingScriptEnvName } from "./constants";
@@ -23,6 +24,7 @@ import { getAbsoluteAndInOsFormatPath } from "./tools/getAbsoluteAndInOsFormatPa
 import MagicString from "magic-string";
 import { createSwEnvJsFile } from "./createSwEnvJsFile";
 import { parseDotEnv, parseEnvValue } from "./parseDotEnv";
+import JSON5 from "json5";
 
 export function viteEnvs(params?: {
     computedEnv?:
@@ -234,17 +236,75 @@ export function viteEnvs(params?: {
                 });
 
                 {
+                    let doesTsconfigHasPatchedTypes = false;
+
+                    patch_tsconfig: {
+                        const tsconfigFilePath = pathJoin(
+                            resultOfConfigResolved.appRootDirPath,
+                            "tsconfig.app.json"
+                        );
+
+                        if (!fs.existsSync(tsconfigFilePath)) {
+                            break patch_tsconfig;
+                        }
+
+                        const getHasPatchedTypes = (tsconfig_str: string) => {
+                            const tsconfig: unknown = JSON5.parse(tsconfig_str);
+
+                            if (
+                                !typeGuard<{ compilerOptions: { types?: unknown[] } }>(
+                                    tsconfig,
+                                    tsconfig instanceof Object &&
+                                        "compilerOptions" in tsconfig &&
+                                        tsconfig.compilerOptions instanceof Object &&
+                                        (("types" in tsconfig.compilerOptions &&
+                                            tsconfig.compilerOptions.types instanceof Array) ||
+                                            (tsconfig.compilerOptions as any).types === undefined)
+                                )
+                            ) {
+                                return false;
+                            }
+
+                            if (!tsconfig.compilerOptions.types?.includes("vite-envs/client")) {
+                                return false;
+                            }
+
+                            return true;
+                        };
+
+                        const tsconfig_str = fs.readFileSync(tsconfigFilePath).toString("utf8");
+
+                        if (getHasPatchedTypes(tsconfig_str)) {
+                            doesTsconfigHasPatchedTypes = true;
+                            break patch_tsconfig;
+                        }
+
+                        const tsconfig_str_patched = tsconfig_str
+                            .replace(/"vite\/client"/g, `"vite-envs/client"`)
+                            .replace(/'vite\/client'/g, `'vite-envs/client'`);
+
+                        if (!getHasPatchedTypes(tsconfig_str_patched)) {
+                            break patch_tsconfig;
+                        }
+
+                        fs.writeFileSync(tsconfigFilePath, Buffer.from(tsconfig_str_patched, "utf8"));
+
+                        doesTsconfigHasPatchedTypes = true;
+                    }
+
                     const ambientModuleDeclarationFilePath = getAmbientModuleDeclarationFilePath({
                         appRootDirPath
                     });
 
                     let dTsFileContent = !fs.existsSync(ambientModuleDeclarationFilePath)
-                        ? `/// <reference types="vite/client" />\n`
+                        ? doesTsconfigHasPatchedTypes
+                            ? ``
+                            : `/// <reference types="vite/client" />\n`
                         : fs.readFileSync(ambientModuleDeclarationFilePath).toString("utf8");
 
                     dTsFileContent = dTsFileContent.replace(
                         /^\s*\/\/\/\s*<reference\s+types=["']vite\/client["']\s*\/>\s*\r?\n?/,
-                        '/// <reference types="vite-envs/client" />\n'
+                        doesTsconfigHasPatchedTypes ? "" : '/// <reference types="vite-envs/client" />\n'
                     );
 
                     const userDefinedStartPlaceholder = "// @user-defined-start";
