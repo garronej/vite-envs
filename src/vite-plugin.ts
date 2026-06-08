@@ -684,6 +684,11 @@ export function viteEnvs(params?: {
 
                 const indexHtmlFilePath = pathJoin(distDirPath, "index.html");
 
+                if (!fs.existsSync(indexHtmlFilePath)) {
+                    // There was an error in the build
+                    return;
+                }
+
                 let processedHtml = fs.readFileSync(indexHtmlFilePath).toString("utf8");
 
                 processedHtml = processedHtml.replace(
