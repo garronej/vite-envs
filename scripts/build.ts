@@ -19,7 +19,12 @@ if (fs.existsSync(join("dist", "index.original.js"))) {
 
 run("npx tsc");
 
-if (!fs.readFileSync(join("dist", "bin", "main.js")).toString("utf8").includes("__nccwpck_require__")) {
+if (
+    !fs
+        .readFileSync(join("dist", "bin", "main.js"))
+        .toString("utf8")
+        .includes("__nccwpck_require__")
+) {
     fs.cpSync(join("dist", "bin", "main.js"), join("dist", "bin", "main.original.js"));
 }
 
