@@ -6,4 +6,5 @@ export type ViteEnvsMeta = {
     computedEnv: Record<string, unknown>;
     baseBuildTimeEnv: Record<string, unknown>;
     nameOfTheGlobal: string;
+    base: string;
 };

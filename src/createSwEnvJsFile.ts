@@ -39,7 +39,7 @@ export function createSwEnvJsFile(params: Params) {
         `      )`,
         `    );`,
         `});`,
-        `self.${nameOfTheGlobal} = env;`
+        `(typeof window !== "undefined" ? window : self).${nameOfTheGlobal} = env;`
     ].join("\n");
 
     try {

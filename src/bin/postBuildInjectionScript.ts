@@ -17,7 +17,8 @@ export async function postBuildInjectionScript() {
         declaredEnv,
         computedEnv,
         htmlPre,
-        nameOfTheGlobal
+        nameOfTheGlobal,
+        base
     }: ViteEnvsMeta = JSON.parse(
         fs.readFileSync(pathJoin(process.cwd(), viteEnvsMetaFileBasename)).toString("utf8")
     );
@@ -69,7 +70,7 @@ export async function postBuildInjectionScript() {
 
     processedHtml = injectInHeadBeforeFirstScriptTag({
         "html": processedHtml,
-        "htmlToInject": getScriptThatDefinesTheGlobal({ "env": mergedEnv, nameOfTheGlobal })
+        "htmlToInject": getScriptThatDefinesTheGlobal(base)
     });
 
     fs.writeFileSync(indexHtmlFilePath, Buffer.from(processedHtml, "utf8"));
